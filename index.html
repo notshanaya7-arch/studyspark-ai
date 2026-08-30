@@ -503,6 +503,279 @@
 
     </div>
 
+</section><!-- =========================
+     FLASHCARDS
+========================= -->
+
+<section id="flashcards" class="study-tool-page">
+
+    <div class="tool-page-header">
+
+        <div class="tool-icon">🃏</div>
+
+        <h2>Smart Flashcards</h2>
+
+        <p>
+            Create and review flashcards for your study topics.
+        </p>
+
+    </div>
+
+    <div class="tool-box">
+
+        <textarea
+            id="flashcardNotes"
+            placeholder="Paste your notes here..."
+        ></textarea>
+
+        <button
+            class="summarize-button"
+            onclick="createFlashcards()"
+        >
+            🃏 Create Flashcards
+        </button>
+
+        <div id="flashcardResult"></div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     AI TEACHER
+========================= -->
+
+<section id="assistant" class="study-tool-page">
+
+    <div class="tool-page-header">
+
+        <div class="tool-icon">🤖</div>
+
+        <h2>AI Study Teacher</h2>
+
+        <p>
+            Ask questions about your study topic.
+        </p>
+
+    </div>
+
+    <div class="tool-box">
+
+        <input
+            type="text"
+            id="teacherTopic"
+            placeholder="What are you studying?"
+        >
+
+        <textarea
+            id="teacherQuestion"
+            placeholder="Ask your question..."
+        ></textarea>
+
+        <button
+            class="summarize-button"
+            onclick="askTeacher()"
+        >
+            🤖 Ask StudySpark
+        </button>
+
+        <div id="teacherResult"></div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     STUDY PLANNER
+========================= -->
+
+<section id="planner" class="study-tool-page">
+
+    <div class="tool-page-header">
+
+        <div class="tool-icon">📅</div>
+
+        <h2>Study Planner</h2>
+
+        <p>
+            Build a simple study plan for your subjects.
+        </p>
+
+    </div>
+
+    <div class="tool-box">
+
+        <input
+            type="text"
+            id="plannerSubject"
+            placeholder="Subject or topic"
+        >
+
+        <input
+            type="number"
+            id="plannerHours"
+            placeholder="Hours available"
+            min="1"
+            max="24"
+        >
+
+        <button
+            class="summarize-button"
+            onclick="createStudyPlan()"
+        >
+            📅 Create Study Plan
+        </button>
+
+        <div id="plannerResult"></div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     FOCUS TIMER
+========================= -->
+
+<section id="timer" class="study-tool-page">
+
+    <div class="tool-page-header">
+
+        <div class="tool-icon">⏱️</div>
+
+        <h2>Focus Timer</h2>
+
+        <p>
+            Focus on your studies without distractions.
+        </p>
+
+    </div>
+
+    <div class="timer-box">
+
+        <div id="timerDisplay">
+            25:00
+        </div>
+
+        <button
+            class="summarize-button"
+            onclick="startTimer()"
+        >
+            ▶ Start
+        </button>
+
+        <button
+            class="summarize-button"
+            onclick="pauseTimer()"
+        >
+            ⏸ Pause
+        </button>
+
+        <button
+            class="summarize-button"
+            onclick="resetTimer()"
+        >
+            🔄 Reset
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     PROGRESS TRACKER
+========================= -->
+
+<section id="progress" class="study-tool-page">
+
+    <div class="tool-page-header">
+
+        <div class="tool-icon">📊</div>
+
+        <h2>Progress Tracker</h2>
+
+        <p>
+            Track your study sessions and progress.
+        </p>
+
+    </div>
+
+    <div class="progress-box">
+
+        <h3>
+            Study Sessions
+        </h3>
+
+        <div
+            id="sessionCount"
+            class="progress-number"
+        >
+            0
+        </div>
+
+        <button
+            class="summarize-button"
+            onclick="addStudySession()"
+        >
+            ✅ Complete Study Session
+        </button>
+
+        <button
+            class="summarize-button"
+            onclick="resetProgress()"
+        >
+            🔄 Reset Progress
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     AI TEACHER
+========================= -->
+
+<section id="teacher" class="study-tool-page">
+
+    <div class="tool-page-header">
+
+        <div class="tool-icon">👩‍🏫</div>
+
+        <h2>AI Teacher</h2>
+
+        <p>
+            Learn difficult concepts in simple language.
+        </p>
+
+    </div>
+
+    <div class="tool-box">
+
+        <textarea
+            id="teacherTopic2"
+            placeholder="Enter the topic you want explained..."
+        ></textarea>
+
+        <button
+            class="summarize-button"
+            onclick="explainTopic()"
+        >
+            👩‍🏫 Explain This
+        </button>
+
+        <div id="teacherExplanation"></div>
+
+    </div>
+
 </section>
         <!-- FOOTER -->
 
