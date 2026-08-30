@@ -1,29 +1,852 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudySpark AI</title>
 
-    <title>StudySpark AI</title>
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
 
-    <link rel="stylesheet" href="style.css">
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f6f7ff;
+    color:#202033;
+    transition:.3s;
+}
+
+button,
+input,
+textarea,
+select{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+/* ================= INTRO ================= */
+
+#intro{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background:#101024;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    overflow:hidden;
+    animation:introOut 1s ease 4.2s forwards;
+}
+
+.intro-content{
+    position:relative;
+    z-index:5;
+    animation:introContent 1s ease;
+}
+
+.intro-logo{
+    font-size:clamp(48px,9vw,100px);
+    font-weight:900;
+    letter-spacing:-5px;
+    animation:logoFly 1.8s cubic-bezier(.17,.67,.25,1.2);
+}
+
+.intro-logo span{
+    color:#9b8cff;
+}
+
+.intro-line{
+    width:0;
+    height:3px;
+    background:#9b8cff;
+    margin:20px auto;
+    border-radius:10px;
+    animation:lineGrow 1s ease 1.5s forwards;
+}
+
+.intro-tagline{
+    color:#d0ccff;
+    font-size:19px;
+    opacity:0;
+    animation:fadeUp 1s ease 1.8s forwards;
+}
+
+.creator-text{
+    margin-top:28px;
+    color:#aaa6d8;
+    font-size:15px;
+    opacity:0;
+    animation:fadeUp 1s ease 2.3s forwards;
+}
+
+.creator-name{
+    margin-top:6px;
+    font-size:24px;
+    color:white;
+    opacity:0;
+    animation:fadeUp 1s ease 2.5s forwards;
+}
+
+.spark{
+    position:absolute;
+    color:white;
+    font-size:30px;
+    opacity:0;
+    animation:sparkle 2.5s infinite;
+}
+
+.spark1{top:18%;left:18%;animation-delay:.3s}
+.spark2{top:25%;right:18%;animation-delay:.8s}
+.spark3{bottom:20%;left:25%;animation-delay:1.2s}
+.spark4{bottom:24%;right:25%;animation-delay:1.6s}
+.spark5{top:15%;right:42%;animation-delay:2s}
+.spark6{bottom:15%;right:45%;animation-delay:2.3s}
+
+@keyframes logoFly{
+    0%{
+        transform:translateX(-100vw) scale(.3) rotate(-15deg);
+        opacity:0;
+    }
+    65%{
+        transform:translateX(30px) scale(1.08) rotate(2deg);
+        opacity:1;
+    }
+    100%{
+        transform:translateX(0) scale(1) rotate(0);
+        opacity:1;
+    }
+}
+
+@keyframes lineGrow{
+    to{width:280px}
+}
+
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(25px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes sparkle{
+    0%,100%{
+        opacity:0;
+        transform:scale(.2) rotate(0);
+    }
+    50%{
+        opacity:1;
+        transform:scale(1.4) rotate(180deg);
+    }
+}
+
+@keyframes introOut{
+    to{
+        opacity:0;
+        visibility:hidden;
+        pointer-events:none;
+    }
+}
+
+@keyframes introContent{
+    from{
+        transform:scale(.8);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+/* ================= NAV ================= */
+
+nav{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 6%;
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid #e6e6f0;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:900;
+}
+
+.logo span{
+    color:#7567ff;
+}
+
+.nav-buttons{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.nav-buttons button{
+    border:none;
+    background:#7567ff;
+    color:white;
+    padding:10px 15px;
+    border-radius:10px;
+    font-weight:bold;
+    transition:.2s;
+}
+
+.nav-buttons button:hover{
+    transform:translateY(-2px);
+}
+
+/* ================= HERO ================= */
+
+.hero{
+    min-height:650px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:80px 20px;
+    background:
+        radial-gradient(circle at top left,#ddd9ff,transparent 35%),
+        radial-gradient(circle at bottom right,#d9f3ff,transparent 35%);
+}
+
+.hero-content{
+    max-width:900px;
+    animation:heroIn 1s ease;
+}
+
+@keyframes heroIn{
+    from{
+        opacity:0;
+        transform:translateY(40px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.badge{
+    display:inline-block;
+    padding:10px 18px;
+    border-radius:30px;
+    background:white;
+    color:#7567ff;
+    font-weight:bold;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+    margin-bottom:25px;
+}
+
+.hero h1{
+    font-size:clamp(48px,8vw,90px);
+    line-height:.98;
+    letter-spacing:-5px;
+    margin-bottom:25px;
+}
+
+.hero h1 span{
+    color:#7567ff;
+}
+
+.hero p{
+    max-width:700px;
+    margin:auto;
+    font-size:20px;
+    line-height:1.7;
+    color:#626276;
+}
+
+.start-button{
+    margin-top:35px;
+    border:none;
+    padding:16px 30px;
+    border-radius:14px;
+    background:#7567ff;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+    box-shadow:0 12px 30px rgba(117,103,255,.3);
+    transition:.25s;
+}
+
+.start-button:hover{
+    transform:translateY(-5px);
+}
+
+/* ================= TOOLS ================= */
+
+#tools{
+    padding:90px 6%;
+    text-align:center;
+}
+
+#tools h2{
+    font-size:44px;
+    margin-bottom:12px;
+}
+
+.section-description{
+    color:#77778b;
+    font-size:18px;
+    margin-bottom:50px;
+}
+
+.tools-grid{
+    max-width:1300px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+    gap:25px;
+}
+
+.tool-card{
+    background:white;
+    padding:30px;
+    border-radius:24px;
+    border:1px solid #e9e9f3;
+    box-shadow:0 12px 35px rgba(0,0,0,.06);
+    text-align:left;
+    transition:.3s;
+}
+
+.tool-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 20px 45px rgba(0,0,0,.1);
+}
+
+.tool-icon{
+    font-size:43px;
+    margin-bottom:18px;
+}
+
+.tool-card h3{
+    font-size:22px;
+    margin-bottom:12px;
+}
+
+.tool-card p{
+    color:#707087;
+    line-height:1.6;
+    margin-bottom:22px;
+}
+
+.tool-card button{
+    border:none;
+    padding:12px 18px;
+    border-radius:11px;
+    background:#7567ff;
+    color:white;
+    font-weight:bold;
+}
+
+/* ================= TOOL PAGES ================= */
+
+.study-tool-page{
+    padding:100px 6%;
+    min-height:700px;
+    scroll-margin-top:80px;
+}
+
+.study-tool-page:nth-child(even){
+    background:#f0f0ff;
+}
+
+.page-heading{
+    text-align:center;
+    max-width:850px;
+    margin:0 auto 45px;
+}
+
+.page-heading .big-icon{
+    font-size:55px;
+}
+
+.page-heading h2{
+    font-size:45px;
+    margin:10px 0;
+}
+
+.page-heading p{
+    color:#707087;
+    font-size:18px;
+    line-height:1.6;
+}
+
+.tool-box{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:35px;
+    border-radius:25px;
+    box-shadow:0 15px 45px rgba(0,0,0,.08);
+}
+
+.tool-box h3{
+    font-size:25px;
+    margin-bottom:8px;
+}
+
+.upload-info{
+    color:#777;
+    margin-bottom:20px;
+}
+
+/* ================= UPLOAD ================= */
+
+.upload-area{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:150px;
+    border:2px dashed #8b80ff;
+    border-radius:18px;
+    background:#f8f7ff;
+    padding:25px;
+    text-align:center;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.upload-area:hover{
+    background:#f0efff;
+    transform:translateY(-2px);
+}
+
+.upload-area input{
+    display:none;
+}
+
+.upload-icon{
+    font-size:40px;
+    margin-bottom:8px;
+}
+
+.upload-area strong{
+    color:#7567ff;
+    font-size:17px;
+}
+
+.upload-area small{
+    color:#888;
+    margin-top:8px;
+}
+
+.file-name{
+    margin-top:12px;
+    color:#666;
+    text-align:center;
+    font-size:14px;
+}
+
+.or-divider{
+    text-align:center;
+    color:#999;
+    font-weight:bold;
+    margin:20px 0;
+}
+
+textarea,
+input[type="text"],
+input[type="number"],
+select{
+    width:100%;
+    border:1px solid #dedeea;
+    border-radius:14px;
+    padding:15px;
+    outline:none;
+    font-size:16px;
+    background:white;
+}
+
+textarea{
+    min-height:190px;
+    resize:vertical;
+}
+
+textarea:focus,
+input:focus,
+select:focus{
+    border-color:#7567ff;
+    box-shadow:0 0 0 3px rgba(117,103,255,.1);
+}
+
+.action-button{
+    width:100%;
+    margin-top:20px;
+    padding:15px;
+    border:none;
+    border-radius:13px;
+    background:#7567ff;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+}
+
+.action-button:hover{
+    background:#6658f0;
+}
+
+/* ================= RESULTS ================= */
+
+.result-box{
+    margin-top:25px;
+    padding:25px;
+    border-radius:18px;
+    background:#f7f7ff;
+    border:1px solid #e6e6f3;
+}
+
+.result-box h3{
+    margin-bottom:15px;
+}
+
+.result-box p{
+    line-height:1.7;
+    color:#55556b;
+}
+
+/* ================= QUIZ ================= */
+
+.quiz-question{
+    padding:20px;
+    margin:15px 0;
+    background:white;
+    border-radius:16px;
+    border:1px solid #e4e4ef;
+}
+
+.quiz-question h4{
+    margin-bottom:15px;
+}
+
+.quiz-option{
+    display:block;
+    padding:12px;
+    margin:7px 0;
+    border:1px solid #ddd;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.quiz-option:hover{
+    background:#f1efff;
+}
+
+.quiz-score{
+    text-align:center;
+    font-size:25px;
+    font-weight:bold;
+    padding:20px;
+}
+
+/* ================= FLASHCARDS ================= */
+
+.flashcard{
+    perspective:1000px;
+    margin:20px auto;
+    max-width:600px;
+    cursor:pointer;
+}
+
+.flashcard-inner{
+    position:relative;
+    min-height:260px;
+    transform-style:preserve-3d;
+    transition:.6s;
+}
+
+.flashcard.flipped .flashcard-inner{
+    transform:rotateY(180deg);
+}
+
+.flash-front,
+.flash-back{
+    position:absolute;
+    inset:0;
+    min-height:260px;
+    padding:35px;
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    backface-visibility:hidden;
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+}
+
+.flash-front{
+    background:#7567ff;
+    color:white;
+    font-size:25px;
+    font-weight:bold;
+}
+
+.flash-back{
+    background:#18182d;
+    color:white;
+    transform:rotateY(180deg);
+    font-size:19px;
+    line-height:1.6;
+}
+
+.flash-controls{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:20px;
+}
+
+.flash-controls button{
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    background:#7567ff;
+    color:white;
+}
+
+/* ================= TEACHER ================= */
+
+.chat-box{
+    margin-top:25px;
+}
+
+.chat-message{
+    padding:18px;
+    border-radius:15px;
+    margin:10px 0;
+    line-height:1.7;
+}
+
+.user-message{
+    background:#7567ff;
+    color:white;
+    margin-left:15%;
+}
+
+.ai-message{
+    background:#f0efff;
+    margin-right:15%;
+}
+
+/* ================= PLANNER ================= */
+
+.plan-item{
+    display:flex;
+    gap:10px;
+    margin:10px 0;
+}
+
+.plan-item input{
+    flex:1;
+}
+
+.plan-item button{
+    border:none;
+    background:#ff6b81;
+    color:white;
+    border-radius:10px;
+    padding:10px;
+}
+
+/* ================= TIMER ================= */
+
+.timer{
+    text-align:center;
+}
+
+.timer-display{
+    font-size:80px;
+    font-weight:900;
+    color:#7567ff;
+    margin:25px;
+}
+
+.timer-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+}
+
+.timer-buttons button{
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    background:#7567ff;
+    color:white;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+    background:#101024;
+    color:white;
+    text-align:center;
+    padding:60px 20px;
+}
+
+footer h3{
+    font-size:27px;
+    margin-bottom:12px;
+}
+
+footer p{
+    color:#bdbbd0;
+    margin:8px 0;
+}
+
+/* ================= DARK MODE ================= */
+
+body.dark{
+    background:#101024;
+    color:white;
+}
+
+body.dark nav{
+    background:rgba(16,16,36,.92);
+    border-color:#292943;
+}
+
+body.dark .hero{
+    background:
+        radial-gradient(circle at top left,#25204b,transparent 35%),
+        radial-gradient(circle at bottom right,#172d3c,transparent 35%);
+}
+
+body.dark .hero p,
+body.dark .page-heading p,
+body.dark .section-description,
+body.dark .tool-card p{
+    color:#bdbdd0;
+}
+
+body.dark .tool-card,
+body.dark .tool-box{
+    background:#19192f;
+    border-color:#30304c;
+}
+
+body.dark .study-tool-page:nth-child(even){
+    background:#15152a;
+}
+
+body.dark textarea,
+body.dark input,
+body.dark select{
+    background:#111126;
+    color:white;
+    border-color:#3a3a55;
+}
+
+body.dark .upload-area{
+    background:#17172e;
+}
+
+body.dark .result-box,
+body.dark .quiz-question{
+    background:#15152a;
+    border-color:#343450;
+}
+
+body.dark .result-box p{
+    color:#c5c5d5;
+}
+
+body.dark .ai-message{
+    background:#242440;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:700px){
+
+    nav{
+        padding:14px 4%;
+        gap:10px;
+    }
+
+    .logo{
+        font-size:20px;
+    }
+
+    .nav-buttons{
+        justify-content:flex-end;
+    }
+
+    .nav-buttons button{
+        padding:8px 10px;
+        font-size:12px;
+    }
+
+    .hero{
+        min-height:570px;
+    }
+
+    .hero h1{
+        letter-spacing:-3px;
+    }
+
+    .hero p{
+        font-size:17px;
+    }
+
+    #tools{
+        padding:65px 5%;
+    }
+
+    .study-tool-page{
+        padding:70px 5%;
+    }
+
+    .tool-box{
+        padding:22px;
+    }
+
+    .page-heading h2{
+        font-size:34px;
+    }
+
+    .timer-display{
+        font-size:60px;
+    }
+}
+</style>
 </head>
 
 <body>
 
-    <!-- ========================= -->
-    <!-- ANIMATED INTRO -->
-    <!-- ========================= -->
+<!-- ================= INTRO ================= -->
 
-    <div id="intro">
+<div id="intro">
 
-       <div id="website">
-
-    <div class="intro-spark spark1">✦</div>
-    <div class="intro-spark spark2">✧</div>
-    <div class="intro-spark spark3">✦</div>
-    <div class="intro-spark spark4">✧</div>
-    <div class="intro-spark spark5">✦</div>
+    <div class="spark spark1">✦</div>
+    <div class="spark spark2">✧</div>
+    <div class="spark spark3">✦</div>
+    <div class="spark spark4">✧</div>
+    <div class="spark spark5">✦</div>
+    <div class="spark spark6">✧</div>
 
     <div class="intro-content">
 
@@ -48,313 +871,257 @@
     </div>
 
 </div>
-        </div>
 
-        <p class="intro-subtitle">
-            Your smarter way to study
-        </p>
+
+<!-- ================= NAV ================= -->
+
+<nav>
+
+    <div class="logo">
+        ✨ StudySpark <span>AI</span>
+    </div>
+
+    <div class="nav-buttons">
+
+        <button onclick="goHome()">Home</button>
+
+        <button onclick="goTo('tools')">
+            Features
+        </button>
+
+        <button onclick="toggleDark()">
+            🌙
+        </button>
 
     </div>
 
+</nav>
 
-    <!-- ========================= -->
-    <!-- MAIN WEBSITE -->
-    <!-- ========================= -->
 
-    <div id="website">
+<!-- ================= HERO ================= -->
 
-        <!-- NAVIGATION -->
+<section class="hero" id="home">
 
-        <nav>
+    <div class="hero-content">
 
-            <div class="logo">
-                ✨ StudySpark <span>AI</span>
-            </div>
-
-            <div class="nav-buttons">
-
-                <button onclick="showHome()">
-                    Home
-                </button>
-
-                <button onclick="toggleTheme()">
-                    🌙
-                </button>
-
-            </div>
-
-        </nav>
-
-
-        <!-- HERO -->
-
-        <section class="hero">
-
-            <div class="hero-content">
-
-                <div class="badge">
-                    ✨ AI-Powered Learning
-                </div>
-
-                <h1>
-                    Study Smarter.
-                    <br>
-                    <span>Not Harder.</span>
-                </h1>
-
-                <p>
-                    Turn your notes into summaries, quizzes,
-                    flashcards and more with StudySpark AI.
-                </p>
-
-                <button class="start-button" onclick="scrollToTools()">
-                    Start Studying 🚀
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- STUDY TOOLS -->
-
-        <section id="tools">
-
-            <h2>
-                Your AI Study Toolkit
-            </h2>
-
-            <p class="section-description">
-                Everything you need to study smarter.
-            </p>
-
-
-            <div class="tools-grid">
-
-
-                <!-- SUMMARIZER -->
-
-                <div class="tool-card">
-
-                    <div class="tool-icon">
-                        📝
-                    </div>
-
-                    <h3>
-                        AI Notes Summarizer
-                    </h3>
-
-                    <p>
-                        Turn long notes, documents and study
-                        material into easy-to-understand summaries.
-                    </p>
-
-                    <button onclick="openTool('summarizer')">
-                        Open Summarizer
-                    </button>
-
-                </div>
-
-
-                <!-- QUIZ -->
-
-                <div class="tool-card">
-
-                    <div class="tool-icon">
-                        ❓
-                    </div>
-
-                    <h3>
-                        AI Quiz Generator
-                    </h3>
-
-                    <p>
-                        Generate quizzes from your study material
-                        and test your knowledge.
-                    </p>
-
-                    <button onclick="openTool('quiz')">
-                        Create Quiz
-                    </button>
-
-                </div>
-
-
-                <!-- FLASHCARDS -->
-
-                <div class="tool-card">
-
-                    <div class="tool-icon">
-                        🃏
-                    </div>
-
-                    <h3>
-                        Flashcards
-                    </h3>
-
-                    <p>
-                        Create smart flashcards to remember
-                        important concepts faster.
-                    </p>
-
-                    <button onclick="openTool('flashcards')">
-                        Make Flashcards
-                    </button>
-
-                </div>
-
-
-                <!-- STUDY ASSISTANT -->
-
-                <div class="tool-card">
-
-                    <div class="tool-icon">
-                        🧠
-                    </div>
-
-                    <h3>
-                        Study Assistant
-                    </h3>
-
-                    <p>
-                        Ask questions and get simple explanations
-                        for difficult topics.
-                    </p>
-
-                    <button onclick="openTool('assistant')">
-                        Ask AI
-                    </button>
-
-                </div>
-
-
-                <!-- STUDY PLANNER -->
-
-                <div class="tool-card">
-
-                    <div class="tool-icon">
-                        📅
-                    </div>
-
-                    <h3>
-                        Study Planner
-                    </h3>
-
-                    <p>
-                        Create a personalized study schedule
-                        and stay organized.
-                    </p>
-
-                    <button onclick="openTool('planner')">
-                        Plan My Study
-                    </button>
-
-                </div>
-
-
-                <!-- FOCUS TIMER -->
-
-                <div class="tool-card">
-
-                    <div class="tool-icon">
-                        ⏱️
-                    </div>
-
-                    <h3>
-                        Focus Timer
-                    </h3>
-
-                    <p>
-                        Use focused study sessions to stay
-                        productive without distractions.
-                    </p>
-
-                    <button onclick="openTool('timer')">
-                        Start Timer
-                    </button>
-
-                </div>
-
-
-                <!-- PROGRESS -->
-
-                <div class="tool-card">
-
-                    <div class="tool-icon">
-                        📊
-                    </div>
-
-                    <h3>
-                        Progress Tracker
-                    </h3>
-
-                    <p>
-                        Keep track of your study sessions
-                        and learning progress.
-                    </p>
-
-                    <button onclick="openTool('progress')">
-                        View Progress
-                    </button>
-
-                </div>
-
-
-                <!-- AI TEACHER -->
-
-                <div class="tool-card">
-
-                    <div class="tool-icon">
-                        👩‍🏫
-                    </div>
-
-                    <h3>
-                        AI Teacher
-                    </h3>
-
-                    <p>
-                        Learn difficult subjects through
-                        simple step-by-step explanations.
-                    </p>
-
-                    <button onclick="openTool('teacher')">
-                        Learn With AI
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-<!-- ========================= -->
-<!-- AI NOTES SUMMARIZER -->
-<!-- ========================= -->
-
-<section id="summarizer" class="study-tool-page">
-
-    <div class="tool-page-header">
-
-        <div class="tool-icon">
-            📝
+        <div class="badge">
+            ✨ AI-Powered Learning
         </div>
 
-        <h2>AI Notes Summarizer</h2>
+        <h1>
+            Study Smarter.
+            <br>
+            <span>Not Harder.</span>
+        </h1>
 
         <p>
-            Upload your study material or paste your notes
-            and turn them into simple summaries.
+            Turn your study material into summaries, quizzes,
+            flashcards, explanations and personalized learning
+            tools — all in one place.
+        </p>
+
+        <button
+            class="start-button"
+            onclick="goTo('tools')"
+        >
+            Start Studying 🚀
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section id="tools">
+
+    <h2>
+        Your Study Toolkit
+    </h2>
+
+    <p class="section-description">
+        Everything you need to learn smarter.
+    </p>
+
+
+    <div class="tools-grid">
+
+        <div class="tool-card">
+
+            <div class="tool-icon">📝</div>
+
+            <h3>AI Summarizer</h3>
+
+            <p>
+                Turn long study material into simple,
+                easy-to-understand notes.
+            </p>
+
+            <button onclick="goTo('summarizer')">
+                Summarize Notes
+            </button>
+
+        </div>
+
+
+        <div class="tool-card">
+
+            <div class="tool-icon">❓</div>
+
+            <h3>AI Quiz Generator</h3>
+
+            <p>
+                Generate multiple questions from your
+                own study material and test yourself.
+            </p>
+
+            <button onclick="goTo('quiz')">
+                Create Quiz
+            </button>
+
+        </div>
+
+
+        <div class="tool-card">
+
+            <div class="tool-icon">🃏</div>
+
+            <h3>Flashcards</h3>
+
+            <p>
+                Turn important concepts into interactive
+                flashcards.
+            </p>
+
+            <button onclick="goTo('flashcards')">
+                Make Flashcards
+            </button>
+
+        </div>
+
+
+        <div class="tool-card">
+
+            <div class="tool-icon">👩‍🏫</div>
+
+            <h3>AI Teacher</h3>
+
+            <p>
+                Give StudySpark your material and get
+                explanations in simple language.
+            </p>
+
+            <button onclick="goTo('aiTeacher')">
+                Teach Me
+            </button>
+
+        </div>
+
+
+        <div class="tool-card">
+
+            <div class="tool-icon">💬</div>
+
+            <h3>Study Assistant</h3>
+
+            <p>
+                Ask questions about your study material
+                and get helpful answers.
+            </p>
+
+            <button onclick="goTo('assistant')">
+                Ask Assistant
+            </button>
+
+        </div>
+
+
+        <div class="tool-card">
+
+            <div class="tool-icon">📅</div>
+
+            <h3>Study Planner</h3>
+
+            <p>
+                Create your own study tasks and keep
+                track of what you need to finish.
+            </p>
+
+            <button onclick="goTo('planner')">
+                Open Planner
+            </button>
+
+        </div>
+
+
+        <div class="tool-card">
+
+            <div class="tool-icon">⏱️</div>
+
+            <h3>Focus Timer</h3>
+
+            <p>
+                Use a simple focus timer to stay
+                concentrated while studying.
+            </p>
+
+            <button onclick="goTo('timer')">
+                Start Timer
+            </button>
+
+        </div>
+
+
+        <div class="tool-card">
+
+            <div class="tool-icon">📊</div>
+
+            <h3>Progress</h3>
+
+            <p>
+                Track your completed study sessions
+                and keep yourself motivated.
+            </p>
+
+            <button onclick="goTo('progress')">
+                View Progress
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= SUMMARIZER ================= -->
+
+<section
+    id="summarizer"
+    class="study-tool-page"
+>
+
+    <div class="page-heading">
+
+        <div class="big-icon">📝</div>
+
+        <h2>AI Summarizer</h2>
+
+        <p>
+            Upload your study material or paste your notes.
+            StudySpark will create a simple summary.
         </p>
 
     </div>
 
 
-    <div class="summarizer-box">
+    <div class="tool-box">
 
         <h3>📚 Add Your Study Material</h3>
 
         <p class="upload-info">
-            Upload PDF, Word documents, images, audio or video.
+            Upload a file OR paste your notes below.
         </p>
 
 
@@ -362,36 +1129,29 @@
 
             <input
                 type="file"
-                id="studyFile"
-                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.mp3,.wav,.mp4,.mov"
+                id="summaryFile"
+                accept=".txt,.md"
             >
 
             <span class="upload-icon">📁</span>
 
-            <strong>Click to upload your file</strong>
+            <strong>
+                Click to upload your notes
+            </strong>
 
             <small>
-                PDF • DOCX • TXT • JPG • PNG • MP3 • MP4
+                TXT / MD files
             </small>
 
         </label>
-<div id="filePreview" class="file-preview">
 
-    <div class="file-preview-icon">
-        📁
-    </div>
-
-    <div>
-        <strong id="fileName">
+        <div
+            class="file-name"
+            id="summaryFileName"
+        >
             No file selected
-        </strong>
+        </div>
 
-        <p id="fileInfo">
-            Upload your study material
-        </p>
-    </div>
-
-</div>
 
         <div class="or-divider">
             OR
@@ -399,157 +1159,203 @@
 
 
         <textarea
-            id="studyNotes"
+            id="summaryNotes"
             placeholder="Paste or type your notes here..."
         ></textarea>
 
 
-        <div class="summary-options">
-
-            <label>
-                Summary length
-            </label>
-
-            <select id="summaryLength">
-
-                <option value="short">
-                    Short
-                </option>
-
-                <option value="medium" selected>
-                    Medium
-                </option>
-
-                <option value="detailed">
-                    Detailed
-                </option>
-
-            </select>
-
-        </div>
-
-
         <button
-            class="summarize-button"
+            class="action-button"
             onclick="summarizeNotes()"
         >
-            ✨ Summarize with AI
+            ✨ Summarize My Notes
         </button>
 
 
-        <div id="summaryResult" class="summary-result">
-
-            <h3>✨ Your Summary</h3>
+        <div
+            id="summaryResult"
+            class="result-box"
+        >
+            <h3>📖 Your Summary</h3>
 
             <p>
-                Your AI-generated summary will appear here.
+                Your summary will appear here.
             </p>
-
         </div>
-
 
     </div>
 
-</section>       
-        <!-- =========================
-     AI QUIZ GENERATOR
-========================= -->
+</section>
 
-<section id="quiz" class="study-tool-page">
 
-    <div class="tool-page-header">
+<!-- ================= QUIZ ================= -->
 
-        <div class="tool-icon">🧠</div>
+<section
+    id="quiz"
+    class="study-tool-page"
+>
+
+    <div class="page-heading">
+
+        <div class="big-icon">❓</div>
 
         <h2>AI Quiz Generator</h2>
 
         <p>
-            Turn your notes into a quick practice quiz.
+            Upload or paste your study material and create
+            a quiz with different questions.
         </p>
 
     </div>
 
 
-    <div class="quiz-box">
+    <div class="tool-box">
 
-        <h3>📚 Enter Your Topic or Notes</h3>
+        <h3>📚 Add Your Study Material</h3>
+
+        <p class="upload-info">
+            Upload a TXT file or paste your notes.
+        </p>
+
+
+        <label class="upload-area">
+
+            <input
+                type="file"
+                id="quizFile"
+                accept=".txt,.md"
+            >
+
+            <span class="upload-icon">📁</span>
+
+            <strong>
+                Click to upload your notes
+            </strong>
+
+            <small>
+                TXT / MD files
+            </small>
+
+        </label>
+
+        <div
+            class="file-name"
+            id="quizFileName"
+        >
+            No file selected
+        </div>
+
+
+        <div class="or-divider">
+            OR
+        </div>
+
 
         <textarea
             id="quizNotes"
-            placeholder="Paste your notes or enter a topic here..."
+            placeholder="Paste your notes here..."
         ></textarea>
 
 
-        <div class="quiz-options">
-
-            <label>
-                Number of questions:
-            </label>
-
-            <select id="questionCount">
-
-                <option value="5">5</option>
-
-                <option value="10">10</option>
-
-                <option value="15">15</option>
-
-            </select>
-
-        </div>
+        <select id="questionCount">
+            <option value="5">5 Questions</option>
+            <option value="10">10 Questions</option>
+            <option value="15">15 Questions</option>
+        </select>
 
 
         <button
-            class="summarize-button"
+            class="action-button"
             onclick="generateQuiz()"
         >
-            ✨ Generate Quiz
+            🚀 Generate Quiz
         </button>
 
 
-        <div id="quizResult" class="quiz-result">
-
-            <h3>🎯 Your Quiz</h3>
-
-            <p>
-                Your questions will appear here.
-            </p>
-
-        </div>
+        <div id="quizResult"></div>
 
     </div>
 
-</section><!-- =========================
-     FLASHCARDS
-========================= -->
+</section>
 
-<section id="flashcards" class="study-tool-page">
 
-    <div class="tool-page-header">
+<!-- ================= FLASHCARDS ================= -->
 
-        <div class="tool-icon">🃏</div>
+<section
+    id="flashcards"
+    class="study-tool-page"
+>
+
+    <div class="page-heading">
+
+        <div class="big-icon">🃏</div>
 
         <h2>Smart Flashcards</h2>
 
         <p>
-            Create and review flashcards for your study topics.
+            Turn your study material into interactive
+            question-and-answer flashcards.
         </p>
 
     </div>
 
+
     <div class="tool-box">
+
+        <h3>📚 Add Your Study Material</h3>
+
+        <p class="upload-info">
+            Upload or paste the material you want
+            to turn into flashcards.
+        </p>
+
+
+        <label class="upload-area">
+
+            <input
+                type="file"
+                id="flashcardFile"
+                accept=".txt,.md"
+            >
+
+            <span class="upload-icon">📁</span>
+
+            <strong>
+                Click to upload your notes
+            </strong>
+
+            <small>
+                TXT / MD files
+            </small>
+
+        </label>
+
+        <div
+            class="file-name"
+            id="flashcardFileName"
+        >
+            No file selected
+        </div>
+
+
+        <div class="or-divider">
+            OR
+        </div>
+
 
         <textarea
             id="flashcardNotes"
             placeholder="Paste your notes here..."
         ></textarea>
 
+
         <button
-            class="summarize-button"
+            class="action-button"
             onclick="createFlashcards()"
         >
             🃏 Create Flashcards
         </button>
+
 
         <div id="flashcardResult"></div>
 
@@ -558,263 +1364,1715 @@
 </section>
 
 
+<!-- ================= AI TEACHER ================= -->
 
-<!-- =========================
-     AI TEACHER
-========================= -->
+<section
+    id="aiTeacher"
+    class="study-tool-page"
+>
 
-<section id="assistant" class="study-tool-page">
+    <div class="page-heading">
 
-    <div class="tool-page-header">
-
-        <div class="tool-icon">🤖</div>
-
-        <h2>AI Study Teacher</h2>
-
-        <p>
-            Ask questions about your study topic.
-        </p>
-
-    </div>
-
-    <div class="tool-box">
-
-        <input
-            type="text"
-            id="teacherTopic"
-            placeholder="What are you studying?"
-        >
-
-        <textarea
-            id="teacherQuestion"
-            placeholder="Ask your question..."
-        ></textarea>
-
-        <button
-            class="summarize-button"
-            onclick="askTeacher()"
-        >
-            🤖 Ask StudySpark
-        </button>
-
-        <div id="teacherResult"></div>
-
-    </div>
-
-</section>
-
-
-
-<!-- =========================
-     STUDY PLANNER
-========================= -->
-
-<section id="planner" class="study-tool-page">
-
-    <div class="tool-page-header">
-
-        <div class="tool-icon">📅</div>
-
-        <h2>Study Planner</h2>
-
-        <p>
-            Build a simple study plan for your subjects.
-        </p>
-
-    </div>
-
-    <div class="tool-box">
-
-        <input
-            type="text"
-            id="plannerSubject"
-            placeholder="Subject or topic"
-        >
-
-        <input
-            type="number"
-            id="plannerHours"
-            placeholder="Hours available"
-            min="1"
-            max="24"
-        >
-
-        <button
-            class="summarize-button"
-            onclick="createStudyPlan()"
-        >
-            📅 Create Study Plan
-        </button>
-
-        <div id="plannerResult"></div>
-
-    </div>
-
-</section>
-
-
-
-<!-- =========================
-     FOCUS TIMER
-========================= -->
-
-<section id="timer" class="study-tool-page">
-
-    <div class="tool-page-header">
-
-        <div class="tool-icon">⏱️</div>
-
-        <h2>Focus Timer</h2>
-
-        <p>
-            Focus on your studies without distractions.
-        </p>
-
-    </div>
-
-    <div class="timer-box">
-
-        <div id="timerDisplay">
-            25:00
-        </div>
-
-        <button
-            class="summarize-button"
-            onclick="startTimer()"
-        >
-            ▶ Start
-        </button>
-
-        <button
-            class="summarize-button"
-            onclick="pauseTimer()"
-        >
-            ⏸ Pause
-        </button>
-
-        <button
-            class="summarize-button"
-            onclick="resetTimer()"
-        >
-            🔄 Reset
-        </button>
-
-    </div>
-
-</section>
-
-
-
-<!-- =========================
-     PROGRESS TRACKER
-========================= -->
-
-<section id="progress" class="study-tool-page">
-
-    <div class="tool-page-header">
-
-        <div class="tool-icon">📊</div>
-
-        <h2>Progress Tracker</h2>
-
-        <p>
-            Track your study sessions and progress.
-        </p>
-
-    </div>
-
-    <div class="progress-box">
-
-        <h3>
-            Study Sessions
-        </h3>
-
-        <div
-            id="sessionCount"
-            class="progress-number"
-        >
-            0
-        </div>
-
-        <button
-            class="summarize-button"
-            onclick="addStudySession()"
-        >
-            ✅ Complete Study Session
-        </button>
-
-        <button
-            class="summarize-button"
-            onclick="resetProgress()"
-        >
-            🔄 Reset Progress
-        </button>
-
-    </div>
-
-</section>
-
-
-
-<!-- =========================
-     AI TEACHER
-========================= -->
-
-<section id="teacher" class="study-tool-page">
-
-    <div class="tool-page-header">
-
-        <div class="tool-icon">👩‍🏫</div>
+        <div class="big-icon">👩‍🏫</div>
 
         <h2>AI Teacher</h2>
 
         <p>
-            Learn difficult concepts in simple language.
+            Give StudySpark your study material and
+            learn the topic in simple language.
         </p>
 
     </div>
 
+
     <div class="tool-box">
 
+        <h3>📚 What should I teach you?</h3>
+
+        <p class="upload-info">
+            Upload your material or paste it below.
+        </p>
+
+
+        <label class="upload-area">
+
+            <input
+                type="file"
+                id="teacherFile"
+                accept=".txt,.md"
+            >
+
+            <span class="upload-icon">📁</span>
+
+            <strong>
+                Click to upload your notes
+            </strong>
+
+            <small>
+                TXT / MD files
+            </small>
+
+        </label>
+
+
+        <div
+            class="file-name"
+            id="teacherFileName"
+        >
+            No file selected
+        </div>
+
+
+        <div class="or-divider">
+            OR
+        </div>
+
+
         <textarea
-            id="teacherTopic2"
-            placeholder="Enter the topic you want explained..."
+            id="teacherNotes"
+            placeholder="Paste your notes or type a topic..."
         ></textarea>
 
-        <button
-            class="summarize-button"
-            onclick="explainTopic()"
+
+        <input
+            type="text"
+            id="teacherQuestion"
+            placeholder="What do you want me to explain?"
         >
-            👩‍🏫 Explain This
+
+
+        <button
+            class="action-button"
+            onclick="teachTopic()"
+        >
+            👩‍🏫 Teach Me
         </button>
 
-        <div id="teacherExplanation"></div>
+
+        <div
+            id="teacherResult"
+            class="chat-box"
+        ></div>
 
     </div>
 
 </section>
-        <!-- FOOTER -->
 
-        <footer>
 
-            <h3>
-                ✨ StudySpark AI
-            </h3>
+<!-- ================= ASSISTANT ================= -->
 
-            <p>
-                Learn smarter. Study better. Achieve more.
-            </p>
+<section
+    id="assistant"
+    class="study-tool-page"
+>
 
-            <p class="copyright">
-                © 2026 StudySpark AI
-            </p>
+    <div class="page-heading">
 
-        </footer>
+        <div class="big-icon">💬</div>
+
+        <h2>Study Assistant</h2>
+
+        <p>
+            Ask questions about your notes and get
+            simple explanations.
+        </p>
 
     </div>
 
 
-    <script src="script.js"></script>
+    <div class="tool-box">
+
+        <h3>📚 Add Your Study Material</h3>
+
+
+        <label class="upload-area">
+
+            <input
+                type="file"
+                id="assistantFile"
+                accept=".txt,.md"
+            >
+
+            <span class="upload-icon">📁</span>
+
+            <strong>
+                Click to upload your notes
+            </strong>
+
+            <small>
+                TXT / MD files
+            </small>
+
+        </label>
+
+
+        <div
+            class="file-name"
+            id="assistantFileName"
+        >
+            No file selected
+        </div>
+
+
+        <div class="or-divider">
+            OR
+        </div>
+
+
+        <textarea
+            id="assistantNotes"
+            placeholder="Paste your study material here..."
+        ></textarea>
+
+
+        <input
+            type="text"
+            id="assistantQuestion"
+            placeholder="Ask a question..."
+        >
+
+
+        <button
+            class="action-button"
+            onclick="askAssistant()"
+        >
+            💡 Ask Question
+        </button>
+
+
+        <div
+            id="assistantResult"
+            class="chat-box"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= PLANNER ================= -->
+
+<section
+    id="planner"
+    class="study-tool-page"
+>
+
+    <div class="page-heading">
+
+        <div class="big-icon">📅</div>
+
+        <h2>Study Planner</h2>
+
+        <p>
+            Add tasks and build your study plan.
+        </p>
+
+    </div>
+
+
+    <div class="tool-box">
+
+        <input
+            id="taskInput"
+            type="text"
+            placeholder="Example: Study Chemistry Chapter 3"
+        >
+
+        <button
+            class="action-button"
+            onclick="addTask()"
+        >
+            ➕ Add Study Task
+        </button>
+
+
+        <div
+            id="taskList"
+            class="result-box"
+        >
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= TIMER ================= -->
+
+<section
+    id="timer"
+    class="study-tool-page"
+>
+
+    <div class="page-heading">
+
+        <div class="big-icon">⏱️</div>
+
+        <h2>Focus Timer</h2>
+
+        <p>
+            Focus on your work and take control of
+            your study session.
+        </p>
+
+    </div>
+
+
+    <div class="tool-box timer">
+
+        <div
+            id="timerDisplay"
+            class="timer-display"
+        >
+            25:00
+        </div>
+
+
+        <div class="timer-buttons">
+
+            <button onclick="startTimer()">
+                ▶ Start
+            </button>
+
+            <button onclick="pauseTimer()">
+                ⏸ Pause
+            </button>
+
+            <button onclick="resetTimer()">
+                ↻ Reset
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= PROGRESS ================= -->
+
+<section
+    id="progress"
+    class="study-tool-page"
+>
+
+    <div class="page-heading">
+
+        <div class="big-icon">📊</div>
+
+        <h2>Your Progress</h2>
+
+        <p>
+            Keep track of how many study activities
+            you complete.
+        </p>
+
+    </div>
+
+
+    <div class="tool-box">
+
+        <div
+            id="progressResult"
+            class="result-box"
+        >
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <h3>
+        ✨ StudySpark AI
+    </h3>
+
+    <p>
+        Learn smarter. Study better. Achieve more.
+    </p>
+
+    <p>
+        Created by a 14 year old ✨
+    </p>
+
+    <p>
+        Shanaya Khan
+    </p>
+
+    <p style="margin-top:25px;font-size:13px;">
+        © 2026 StudySpark AI
+    </p>
+
+</footer>
+
+
+<script>
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function goTo(id){
+
+    const element =
+        document.getElementById(id);
+
+    if(element){
+
+        element.scrollIntoView({
+            behavior:"smooth"
+        });
+
+    }
+
+}
+
+function goHome(){
+
+    goTo("home");
+
+}
+
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+function toggleDark(){
+
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+        "studySparkDark",
+        document.body.classList.contains("dark")
+    );
+
+}
+
+if(
+    localStorage.getItem("studySparkDark")
+    === "true"
+){
+
+    document.body.classList.add("dark");
+
+}
+
+
+/* =====================================================
+   FILE UPLOAD SYSTEM
+===================================================== */
+
+function setupFile(
+    inputId,
+    textareaId,
+    nameId
+){
+
+    const input =
+        document.getElementById(inputId);
+
+    const textarea =
+        document.getElementById(textareaId);
+
+    const name =
+        document.getElementById(nameId);
+
+    if(!input || !textarea) return;
+
+
+    input.addEventListener(
+        "change",
+        function(){
+
+            const file =
+                input.files[0];
+
+            if(!file) return;
+
+
+            if(name){
+
+                name.textContent =
+                    "📎 " + file.name;
+
+            }
+
+
+            if(
+                file.type === "text/plain" ||
+                file.name.toLowerCase().endsWith(".txt") ||
+                file.name.toLowerCase().endsWith(".md")
+            ){
+
+                const reader =
+                    new FileReader();
+
+                reader.onload =
+                    function(event){
+
+                        textarea.value =
+                            event.target.result;
+
+                    };
+
+                reader.readAsText(file);
+
+            }
+
+        }
+    );
+
+}
+
+
+/* Connect uploaders */
+
+setupFile(
+    "summaryFile",
+    "summaryNotes",
+    "summaryFileName"
+);
+
+setupFile(
+    "quizFile",
+    "quizNotes",
+    "quizFileName"
+);
+
+setupFile(
+    "flashcardFile",
+    "flashcardNotes",
+    "flashcardFileName"
+);
+
+setupFile(
+    "teacherFile",
+    "teacherNotes",
+    "teacherFileName"
+);
+
+setupFile(
+    "assistantFile",
+    "assistantNotes",
+    "assistantFileName"
+);
+
+
+/* =====================================================
+   TEXT PROCESSING
+===================================================== */
+
+function cleanText(text){
+
+    return text
+        .replace(/\s+/g," ")
+        .trim();
+
+}
+
+
+function sentences(text){
+
+    return text
+        .split(/[.!?]+/)
+        .map(x => x.trim())
+        .filter(x => x.length > 20);
+
+}
+
+
+function words(text){
+
+    return cleanText(text)
+        .split(/\s+/)
+        .filter(Boolean);
+
+}
+
+
+/* =====================================================
+   SUMMARIZER
+===================================================== */
+
+function summarizeNotes(){
+
+    const text =
+        document.getElementById(
+            "summaryNotes"
+        ).value.trim();
+
+    const result =
+        document.getElementById(
+            "summaryResult"
+        );
+
+
+    if(!text){
+
+        result.innerHTML = `
+            <h3>📚 Add Your Material First</h3>
+            <p>
+                Upload a TXT file or paste your notes.
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    const all =
+        sentences(text);
+
+
+    let selected =
+        all.slice(
+            0,
+            Math.min(8,all.length)
+        );
+
+
+    if(selected.length === 0){
+
+        selected =
+            [text];
+
+    }
+
+
+    result.innerHTML = `
+
+        <h3>✨ Simple Summary</h3>
+
+        <ul style="
+            line-height:1.8;
+            padding-left:20px;
+        ">
+
+            ${selected.map(
+                x => `<li>${x}.</li>`
+            ).join("")}
+
+        </ul>
+
+        <br>
+
+        <p>
+            📌 This summary was created from
+            your study material.
+        </p>
+    `;
+
+    addProgress();
+
+}
+
+
+/* =====================================================
+   QUIZ GENERATOR
+===================================================== */
+
+let currentQuiz = [];
+let quizScore = 0;
+
+
+function generateQuiz(){
+
+    const text =
+        document.getElementById(
+            "quizNotes"
+        ).value.trim();
+
+    const count =
+        Number(
+            document.getElementById(
+                "questionCount"
+            ).value
+        );
+
+    const result =
+        document.getElementById(
+            "quizResult"
+        );
+
+
+    if(!text){
+
+        result.innerHTML = `
+            <div class="result-box">
+                <h3>📚 Add Your Material First</h3>
+                <p>
+                    Upload your notes or paste them
+                    before generating a quiz.
+                </p>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    let data =
+        sentences(text);
+
+
+    if(data.length < 3){
+
+        const ws =
+            words(text);
+
+        data = [];
+
+        for(
+            let i=0;
+            i<ws.length;
+            i+=12
+        ){
+
+            data.push(
+                ws.slice(i,i+12).join(" ")
+            );
+
+        }
+
+    }
+
+
+    currentQuiz = [];
+
+
+    for(
+        let i=0;
+        i<Math.min(count,data.length);
+        i++
+    ){
+
+        const sentence =
+            data[i];
+
+        const wordList =
+            sentence
+                .replace(/[,.!?]/g,"")
+                .split(" ");
+
+
+        let important =
+            wordList
+                .filter(
+                    w =>
+                    w.length > 5
+                );
+
+
+        if(
+            important.length === 0
+        ){
+
+            important =
+                wordList;
+
+        }
+
+
+        const answer =
+            important[
+                i % important.length
+            ];
+
+
+        const question =
+            sentence.replace(
+                new RegExp(
+                    "\\b" +
+                    answer.replace(
+                        /[.*+?^${}()|[\]\\]/g,
+                        "\\$&"
+                    ) +
+                    "\\b",
+                    "i"
+                ),
+                "_____"
+            );
+
+
+        const wrong1 =
+            important[
+                (i+1) %
+                important.length
+            ] || "None";
+
+
+        const wrong2 =
+            important[
+                (i+2) %
+                important.length
+            ] || "Unknown";
+
+
+        const wrong3 =
+            important[
+                (i+3) %
+                important.length
+            ] || "All of these";
+
+
+        let options =
+            [
+                answer,
+                wrong1,
+                wrong2,
+                wrong3
+            ];
+
+
+        options =
+            [...new Set(options)];
+
+
+        while(options.length < 4){
+
+            options.push(
+                "Not mentioned"
+            );
+
+        }
+
+
+        options =
+            options.slice(0,4);
+
+
+        for(
+            let j=options.length-1;
+            j>0;
+            j--
+        ){
+
+            const random =
+                Math.floor(
+                    Math.random()*(j+1)
+                );
+
+            [
+                options[j],
+                options[random]
+            ] =
+            [
+                options[random],
+                options[j]
+            ];
+
+        }
+
+
+        currentQuiz.push({
+            question,
+            answer,
+            options
+        });
+
+    }
+
+
+    quizScore = 0;
+
+
+    renderQuiz();
+
+}
+
+
+function renderQuiz(){
+
+    const result =
+        document.getElementById(
+            "quizResult"
+        );
+
+
+    if(currentQuiz.length === 0){
+
+        result.innerHTML = `
+            <div class="result-box">
+                <h3>Not enough material</h3>
+                <p>
+                    Add more detailed notes and try again.
+                </p>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    result.innerHTML = `
+
+        <div class="result-box">
+
+            <h3>🎯 Your Quiz</h3>
+
+            <p>
+                Answer each question and check
+                your score at the end.
+            </p>
+
+            ${currentQuiz.map(
+                (q,i) => `
+
+                <div class="quiz-question">
+
+                    <h4>
+                        ${i+1}. ${q.question}
+                    </h4>
+
+                    ${q.options.map(
+                        option => `
+
+                        <label class="quiz-option">
+
+                            <input
+                                type="radio"
+                                name="q${i}"
+                                value="${escapeHTML(option)}"
+                            >
+
+                            ${option}
+
+                        </label>
+
+                        `
+                    ).join("")}
+
+                </div>
+
+                `
+            ).join("")}
+
+
+            <button
+                class="action-button"
+                onclick="checkQuiz()"
+            >
+                ✅ Check My Answers
+            </button>
+
+            <div id="quizScore"></div>
+
+        </div>
+
+    `;
+
+}
+
+
+function checkQuiz(){
+
+    let score = 0;
+
+
+    currentQuiz.forEach(
+        (q,i) => {
+
+            const selected =
+                document.querySelector(
+                    `input[name="q${i}"]:checked`
+                );
+
+
+            if(
+                selected &&
+                selected.value === q.answer
+            ){
+
+                score++;
+
+            }
+
+        }
+    );
+
+
+    quizScore = score;
+
+
+    document.getElementById(
+        "quizScore"
+    ).innerHTML = `
+
+        <div class="quiz-score">
+
+            🎉 You scored
+            ${score}/${currentQuiz.length}
+
+            <br>
+
+            <button
+                class="action-button"
+                onclick="generateQuiz()"
+            >
+                🔄 Generate Another Quiz
+            </button>
+
+        </div>
+
+    `;
+
+    addProgress();
+
+}
+
+
+/* =====================================================
+   FLASHCARDS
+===================================================== */
+
+let cards = [];
+let cardIndex = 0;
+
+
+function createFlashcards(){
+
+    const text =
+        document.getElementById(
+            "flashcardNotes"
+        ).value.trim();
+
+    const result =
+        document.getElementById(
+            "flashcardResult"
+        );
+
+
+    if(!text){
+
+        result.innerHTML = `
+            <div class="result-box">
+                <h3>📚 Add Your Material First</h3>
+                <p>
+                    Upload or paste your notes.
+                </p>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    const data =
+        sentences(text);
+
+
+    cards = [];
+
+
+    data
+        .slice(0,12)
+        .forEach(
+            (sentence,index) => {
+
+                const ws =
+                    sentence.split(" ");
+
+
+                const important =
+                    ws.find(
+                        word =>
+                        word.length > 6
+                    );
+
+
+                cards.push({
+
+                    question:
+                        "What is the main idea of: " +
+                        sentence + "?",
+
+                    answer:
+                        "Key concept " +
+                        (important ||
+                        "from this statement") +
+                        " — " +
+                        sentence
+
+                });
+
+            }
+        );
+
+
+    if(cards.length === 0){
+
+        cards.push({
+
+            question:
+                "What is the main idea of your notes?",
+
+            answer:
+                text
+
+        });
+
+    }
+
+
+    cardIndex = 0;
+
+    renderFlashcard();
+
+    addProgress();
+
+}
+
+
+function renderFlashcard(){
+
+    const result =
+        document.getElementById(
+            "flashcardResult"
+        );
+
+
+    const card =
+        cards[cardIndex];
+
+
+    result.innerHTML = `
+
+        <div class="result-box">
+
+            <p style="text-align:center;">
+                Card ${cardIndex+1}
+                of ${cards.length}
+            </p>
+
+            <div
+                class="flashcard"
+                onclick="this.classList.toggle('flipped')"
+            >
+
+                <div class="flashcard-inner">
+
+                    <div class="flash-front">
+                        ${card.question}
+                    </div>
+
+                    <div class="flash-back">
+                        ${card.answer}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <p style="text-align:center;">
+                👆 Click the card to flip it
+            </p>
+
+
+            <div class="flash-controls">
+
+                <button onclick="previousCard()">
+                    ← Previous
+                </button>
+
+                <button onclick="nextCard()">
+                    Next →
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+function nextCard(){
+
+    if(!cards.length) return;
+
+    cardIndex =
+        (cardIndex+1) %
+        cards.length;
+
+    renderFlashcard();
+
+}
+
+
+function previousCard(){
+
+    if(!cards.length) return;
+
+    cardIndex =
+        (cardIndex-1+cards.length) %
+        cards.length;
+
+    renderFlashcard();
+
+}
+
+
+/* =====================================================
+   AI TEACHER
+===================================================== */
+
+function teachTopic(){
+
+    const notes =
+        document.getElementById(
+            "teacherNotes"
+        ).value.trim();
+
+    const question =
+        document.getElementById(
+            "teacherQuestion"
+        ).value.trim();
+
+    const result =
+        document.getElementById(
+            "teacherResult"
+        );
+
+
+    if(!notes){
+
+        result.innerHTML = `
+            <div class="chat-message ai-message">
+                📚 Give me some study material first.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    const topic =
+        question ||
+        "this topic";
+
+
+    const related =
+        sentences(notes)
+            .slice(0,4);
+
+
+    result.innerHTML = `
+
+        <div class="chat-message user-message">
+
+            You asked:
+            <strong>
+                ${escapeHTML(topic)}
+            </strong>
+
+        </div>
+
+
+        <div class="chat-message ai-message">
+
+            <strong>👩‍🏫 StudySpark Teacher</strong>
+
+            <p style="margin-top:10px;">
+
+                Let's make this simple.
+
+                Based on your material,
+                <strong>
+                    ${escapeHTML(topic)}
+                </strong>
+                is connected to the following
+                ideas:
+
+            </p>
+
+            <ul style="
+                margin-top:12px;
+                padding-left:20px;
+                line-height:1.8;
+            ">
+
+                ${related.map(
+                    x =>
+                    `<li>${escapeHTML(x)}</li>`
+                ).join("")}
+
+            </ul>
+
+            <p style="margin-top:15px;">
+
+                💡 <strong>Study tip:</strong>
+                Read each idea once, close your notes,
+                and explain it in your own words.
+
+            </p>
+
+        </div>
+
+    `;
+
+    addProgress();
+
+}
+
+
+/* =====================================================
+   STUDY ASSISTANT
+===================================================== */
+
+function askAssistant(){
+
+    const notes =
+        document.getElementById(
+            "assistantNotes"
+        ).value.trim();
+
+    const question =
+        document.getElementById(
+            "assistantQuestion"
+        ).value.trim();
+
+    const result =
+        document.getElementById(
+            "assistantResult"
+        );
+
+
+    if(!notes){
+
+        result.innerHTML = `
+            <div class="chat-message ai-message">
+                📚 Upload or paste your study material first.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    if(!question){
+
+        result.innerHTML = `
+            <div class="chat-message ai-message">
+                💬 Ask me something about your notes.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    const relevant =
+        sentences(notes)
+            .filter(
+                sentence =>
+                question
+                    .toLowerCase()
+                    .split(" ")
+                    .some(
+                        word =>
+                        word.length > 4 &&
+                        sentence
+                            .toLowerCase()
+                            .includes(word)
+                    )
+            )
+            .slice(0,3);
+
+
+    const answer =
+        relevant.length
+        ? relevant.join(". ") + "."
+        : "I couldn't find an exact answer in the material you provided. Try asking about a specific concept from your notes.";
+
+
+    result.innerHTML = `
+
+        <div class="chat-message user-message">
+
+            ${escapeHTML(question)}
+
+        </div>
+
+
+        <div class="chat-message ai-message">
+
+            <strong>🤖 StudySpark</strong>
+
+            <p style="margin-top:10px;">
+                ${escapeHTML(answer)}
+            </p>
+
+        </div>
+
+    `;
+
+    addProgress();
+
+}
+
+
+/* =====================================================
+   PLANNER
+===================================================== */
+
+let tasks =
+    JSON.parse(
+        localStorage.getItem(
+            "studySparkTasks"
+        ) || "[]"
+    );
+
+
+function addTask(){
+
+    const input =
+        document.getElementById(
+            "taskInput"
+        );
+
+    const text =
+        input.value.trim();
+
+
+    if(!text) return;
+
+
+    tasks.push({
+
+        text,
+        done:false
+
+    });
+
+
+    input.value = "";
+
+    saveTasks();
+
+    renderTasks();
+
+}
+
+
+function saveTasks(){
+
+    localStorage.setItem(
+        "studySparkTasks",
+        JSON.stringify(tasks)
+    );
+
+}
+
+
+function renderTasks(){
+
+    const list =
+        document.getElementById(
+            "taskList"
+        );
+
+
+    if(!tasks.length){
+
+        list.innerHTML = `
+            <p>
+                📚 No tasks yet.
+                Add your first study task!
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        tasks.map(
+            (task,index) => `
+
+            <div
+                style="
+                    display:flex;
+                    gap:10px;
+                    align-items:center;
+                    margin:12px 0;
+                "
+            >
+
+                <input
+                    type="checkbox"
+                    ${task.done ? "checked" : ""}
+                    onchange="toggleTask(${index})"
+                >
+
+                <span style="
+                    flex:1;
+                    text-decoration:
+                    ${task.done ? "line-through" : "none"};
+                ">
+                    ${escapeHTML(task.text)}
+                </span>
+
+                <button
+                    onclick="deleteTask(${index})"
+                    style="
+                        border:none;
+                        background:#ff6b81;
+                        color:white;
+                        padding:8px;
+                        border-radius:8px;
+                    "
+                >
+                    🗑
+                </button>
+
+            </div>
+
+            `
+        ).join("");
+
+}
+
+
+function toggleTask(index){
+
+    tasks[index].done =
+        !tasks[index].done;
+
+    saveTasks();
+    renderTasks();
+
+    addProgress();
+
+}
+
+
+function deleteTask(index){
+
+    tasks.splice(index,1);
+
+    saveTasks();
+    renderTasks();
+
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+let timerSeconds = 25 * 60;
+let timerInterval = null;
+
+
+function updateTimer(){
+
+    const minutes =
+        Math.floor(
+            timerSeconds / 60
+        );
+
+    const seconds =
+        timerSeconds % 60;
+
+
+    document.getElementById(
+        "timerDisplay"
+    ).textContent =
+
+        String(minutes).padStart(2,"0")
+        + ":" +
+        String(seconds).padStart(2,"0");
+
+}
+
+
+function startTimer(){
+
+    if(timerInterval) return;
+
+
+    timerInterval =
+        setInterval(
+            function(){
+
+                if(timerSeconds > 0){
+
+                    timerSeconds--;
+
+                    updateTimer();
+
+                }
+                else{
+
+                    clearInterval(
+                        timerInterval
+                    );
+
+                    timerInterval = null;
+
+                    alert(
+                        "🎉 Focus session complete!"
+                    );
+
+                    addProgress();
+
+                }
+
+            },
+            1000
+        );
+
+}
+
+
+function pauseTimer(){
+
+    clearInterval(
+        timerInterval
+    );
+
+    timerInterval = null;
+
+}
+
+
+function resetTimer(){
+
+    pauseTimer();
+
+    timerSeconds =
+        25 * 60;
+
+    updateTimer();
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+let progress =
+    Number(
+        localStorage.getItem(
+            "studySparkProgress"
+        ) || 0
+    );
+
+
+function addProgress(){
+
+    progress++;
+
+    localStorage.setItem(
+        "studySparkProgress",
+        progress
+    );
+
+    renderProgress();
+
+}
+
+
+function renderProgress(){
+
+    const result =
+        document.getElementById(
+            "progressResult"
+        );
+
+    if(!result) return;
+
+
+    result.innerHTML = `
+
+        <h3>
+            🌟 Your Study Progress
+        </h3>
+
+        <p style="
+            font-size:40px;
+            font-weight:900;
+            color:#7567ff;
+            margin:20px 0;
+        ">
+            ${progress}
+        </p>
+
+        <p>
+            study activities completed.
+        </p>
+
+        <p style="margin-top:15px;">
+            Keep going! Every session gets you
+            closer to your goals. 🚀
+        </p>
+
+    `;
+
+}
+
+
+/* =====================================================
+   SAFETY FOR TEXT
+===================================================== */
+
+function escapeHTML(text){
+
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+   STARTUP
+===================================================== */
+
+renderTasks();
+renderProgress();
+updateTimer();
+
+
+/* Keep intro from blocking website */
+setTimeout(
+    function(){
+
+        const intro =
+            document.getElementById(
+                "intro"
+            );
+
+        if(intro){
+
+            intro.style.pointerEvents =
+                "none";
+
+        }
+
+    },
+    4500
+);
+
+</script>
 
 </body>
 </html>
