@@ -434,6 +434,75 @@
 
     </div>
 
+</section>       
+        <!-- =========================
+     AI QUIZ GENERATOR
+========================= -->
+
+<section id="quiz" class="study-tool-page">
+
+    <div class="tool-page-header">
+
+        <div class="tool-icon">🧠</div>
+
+        <h2>AI Quiz Generator</h2>
+
+        <p>
+            Turn your notes into a quick practice quiz.
+        </p>
+
+    </div>
+
+
+    <div class="quiz-box">
+
+        <h3>📚 Enter Your Topic or Notes</h3>
+
+        <textarea
+            id="quizNotes"
+            placeholder="Paste your notes or enter a topic here..."
+        ></textarea>
+
+
+        <div class="quiz-options">
+
+            <label>
+                Number of questions:
+            </label>
+
+            <select id="questionCount">
+
+                <option value="5">5</option>
+
+                <option value="10">10</option>
+
+                <option value="15">15</option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="summarize-button"
+            onclick="generateQuiz()"
+        >
+            ✨ Generate Quiz
+        </button>
+
+
+        <div id="quizResult" class="quiz-result">
+
+            <h3>🎯 Your Quiz</h3>
+
+            <p>
+                Your questions will appear here.
+            </p>
+
+        </div>
+
+    </div>
+
 </section>
         <!-- FOOTER -->
 
