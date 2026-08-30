@@ -61,11 +61,15 @@ function openTool(tool) {
 
 function summarizeNotes() {
 
-    const notes = document.getElementById("studyNotes").value.trim();
-
+    const notesBox = document.getElementById("studyNotes");
     const result = document.getElementById("summaryResult");
+    const length = document.getElementById("summaryLength");
 
-    const length = document.getElementById("summaryLength").value;
+    if (!notesBox || !result) {
+        return;
+    }
+
+    const notes = notesBox.value.trim();
 
 
     if (notes === "") {
@@ -82,32 +86,30 @@ function summarizeNotes() {
     }
 
 
-    let sentences = notes
+    const sentences = notes
         .split(/[.!?]+/)
         .map(sentence => sentence.trim())
         .filter(sentence => sentence.length > 0);
 
 
-    let numberOfSentences;
+    let numberOfSentences = 4;
 
 
-    if (length === "short") {
-
+    if (length.value === "short") {
         numberOfSentences = 2;
+    }
 
-    } else if (length === "medium") {
-
-        numberOfSentences = 4;
-
-    } else {
-
+    if (length.value === "detailed") {
         numberOfSentences = 7;
     }
 
 
-    const summary = sentences
-        .slice(0, numberOfSentences)
-        .join(". ") + ".";
+    const selectedSentences =
+        sentences.slice(0, numberOfSentences);
+
+
+    const summary =
+        selectedSentences.join(". ") + ".";
 
 
     result.innerHTML = `
@@ -130,22 +132,29 @@ function summarizeNotes() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const fileInput = document.getElementById("studyFile");
+    const fileInput =
+        document.getElementById("studyFile");
+
+    const uploadText =
+        document.querySelector(".upload-area strong");
 
 
-    if (fileInput) {
+    if (fileInput && uploadText) {
 
         fileInput.addEventListener("change", function () {
 
             if (fileInput.files.length > 0) {
 
-                const fileName = fileInput.files[0].name;
+                const file =
+                    fileInput.files[0];
 
-                const uploadArea =
-                    document.querySelector(".upload-area strong");
+                uploadText.textContent =
+                    "📎 " + file.name;
 
-                uploadArea.textContent =
-                    "📎 " + fileName;
+            } else {
+
+                uploadText.textContent =
+                    "Click to upload your file";
             }
 
         });
@@ -153,3 +162,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+  
