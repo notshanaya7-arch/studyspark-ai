@@ -907,5 +907,578 @@ function shuffleArray(array) {
 
     return copy;
 }
+/* =====================================================
+   STUDYSPARK AI - EXTRA STUDY TOOLS
+===================================================== */
 
+
+/* =====================================================
+   OPEN EXTRA TOOLS
+===================================================== */
+
+function openTool(tool) {
+
+    const sections = {
+        summarizer: "summarizer",
+        quiz: "quiz",
+        flashcards: "flashcards",
+        assistant: "assistant",
+        planner: "planner",
+        timer: "timer",
+        progress: "progress",
+        teacher: "teacher"
+    };
+
+    const sectionId = sections[tool];
+
+    if (sectionId) {
+
+        const section =
+            document.getElementById(sectionId);
+
+        if (section) {
+
+            section.scrollIntoView({
+                behavior: "smooth"
+            });
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   SMART FLASHCARDS
+===================================================== */
+
+function createFlashcards() {
+
+    const notes =
+        document.getElementById("flashcardNotes").value.trim();
+
+    const result =
+        document.getElementById("flashcardResult");
+
+
+    if (!notes) {
+
+        result.innerHTML = `
+            <div class="tool-result">
+                <h3>⚠️ Add your notes first</h3>
+                <p>
+                    Paste your study material above.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const sentences =
+        notes
+        .split(/[.!?]+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 20);
+
+
+    if (sentences.length < 2) {
+
+        result.innerHTML = `
+            <div class="tool-result">
+                <h3>⚠️ Add more information</h3>
+                <p>
+                    Add a few sentences so StudySpark
+                    can create useful flashcards.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const cards =
+        sentences.slice(0, 12);
+
+
+    result.innerHTML = `
+
+        <h3>🃏 Your Flashcards</h3>
+
+        <p>
+            Click a card to reveal the answer.
+        </p>
+
+        <div class="flashcard-grid">
+
+            ${cards.map((sentence, index) => `
+
+                <div
+                    class="flashcard"
+                    onclick="flipFlashcard(this)"
+                >
+
+                    <div class="flashcard-front">
+
+                        <strong>
+                            Card ${index + 1}
+                        </strong>
+
+                        <p>
+                            What is the key idea?
+                        </p>
+
+                    </div>
+
+
+                    <div class="flashcard-back">
+
+                        <p>
+                            ${sentence}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            `).join("")}
+
+        </div>
+    `;
+}
+
+
+function flipFlashcard(card) {
+
+    card.classList.toggle("flipped");
+
+}
+
+
+/* =====================================================
+   STUDY PLANNER
+===================================================== */
+
+function createStudyPlan() {
+
+    const subject =
+        document.getElementById("plannerSubject")
+        .value
+        .trim();
+
+
+    const hours =
+        parseInt(
+            document.getElementById("plannerHours").value
+        );
+
+
+    const result =
+        document.getElementById("plannerResult");
+
+
+    if (!subject || !hours) {
+
+        result.innerHTML = `
+            <div class="tool-result">
+                <h3>⚠️ Enter your subject and time</h3>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const tasks = [
+        "Learn the main concepts",
+        "Review important definitions",
+        "Practice questions",
+        "Review mistakes",
+        "Quick final revision"
+    ];
+
+
+    let plan = "";
+
+    const minutes =
+        Math.max(
+            15,
+            Math.floor(
+                (hours * 60) / tasks.length
+            )
+        );
+
+
+    tasks.forEach(
+        (task, index) => {
+
+            plan += `
+
+                <div class="plan-item">
+
+                    <strong>
+                        Session ${index + 1}
+                    </strong>
+
+                    <span>
+                        ${task}
+                    </span>
+
+                    <small>
+                        ${minutes} minutes
+                    </small>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    result.innerHTML = `
+
+        <div class="tool-result">
+
+            <h3>
+                📅 Your ${subject} Study Plan
+            </h3>
+
+            ${plan}
+
+        </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   FOCUS TIMER
+===================================================== */
+
+let timerSeconds = 25 * 60;
+let timerInterval = null;
+
+
+function updateTimerDisplay() {
+
+    const display =
+        document.getElementById("timerDisplay");
+
+
+    if (!display) return;
+
+
+    const minutes =
+        Math.floor(timerSeconds / 60);
+
+
+    const seconds =
+        timerSeconds % 60;
+
+
+    display.textContent =
+        String(minutes).padStart(2, "0")
+        + ":"
+        + String(seconds).padStart(2, "0");
+
+}
+
+
+function startTimer() {
+
+    if (timerInterval) return;
+
+
+    timerInterval =
+        setInterval(() => {
+
+            if (timerSeconds > 0) {
+
+                timerSeconds--;
+
+                updateTimerDisplay();
+
+            }
+
+            else {
+
+                clearInterval(timerInterval);
+
+                timerInterval = null;
+
+                alert(
+                    "🎉 Focus session complete! Great work!"
+                );
+
+                addStudySession();
+
+            }
+
+        }, 1000);
+
+}
+
+
+function pauseTimer() {
+
+    clearInterval(timerInterval);
+
+    timerInterval = null;
+
+}
+
+
+function resetTimer() {
+
+    clearInterval(timerInterval);
+
+    timerInterval = null;
+
+    timerSeconds = 25 * 60;
+
+    updateTimerDisplay();
+
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    updateTimerDisplay
+);
+
+
+/* =====================================================
+   PROGRESS TRACKER
+===================================================== */
+
+function getStudySessions() {
+
+    return parseInt(
+        localStorage.getItem(
+            "studySparkSessions"
+        ) || "0"
+    );
+
+}
+
+
+function updateProgressDisplay() {
+
+    const display =
+        document.getElementById("sessionCount");
+
+
+    if (display) {
+
+        display.textContent =
+            getStudySessions();
+
+    }
+
+}
+
+
+function addStudySession() {
+
+    const sessions =
+        getStudySessions() + 1;
+
+
+    localStorage.setItem(
+        "studySparkSessions",
+        sessions
+    );
+
+
+    updateProgressDisplay();
+
+}
+
+
+function resetProgress() {
+
+    localStorage.setItem(
+        "studySparkSessions",
+        "0"
+    );
+
+
+    updateProgressDisplay();
+
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    updateProgressDisplay
+);
+
+
+/* =====================================================
+   AI TEACHER - STUDY EXPLANATION
+===================================================== */
+
+function explainTopic() {
+
+    const input =
+        document
+        .getElementById("teacherTopic2");
+
+
+    const result =
+        document
+        .getElementById("teacherExplanation");
+
+
+    const topic =
+        input.value.trim();
+
+
+    if (!topic) {
+
+        result.innerHTML = `
+            <div class="tool-result">
+
+                <h3>⚠️ Enter a topic</h3>
+
+                <p>
+                    Type the topic you want to learn.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    result.innerHTML = `
+
+        <div class="tool-result">
+
+            <h3>
+                👩‍🏫 Learning: ${topic}
+            </h3>
+
+            <p>
+                StudySpark is preparing a simple
+                explanation for this topic.
+            </p>
+
+            <div class="teacher-steps">
+
+                <div>
+                    <strong>1. Understand</strong>
+                    <p>
+                        Start with the basic meaning
+                        of ${topic}.
+                    </p>
+                </div>
+
+                <div>
+                    <strong>2. Break it down</strong>
+                    <p>
+                        Divide the topic into smaller
+                        concepts.
+                    </p>
+                </div>
+
+                <div>
+                    <strong>3. Practice</strong>
+                    <p>
+                        Test yourself with questions
+                        and examples.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   SIMPLE TEACHER CHAT
+===================================================== */
+
+function askTeacher() {
+
+    const topic =
+        document
+        .getElementById("teacherTopic")
+        .value
+        .trim();
+
+
+    const question =
+        document
+        .getElementById("teacherQuestion")
+        .value
+        .trim();
+
+
+    const result =
+        document
+        .getElementById("teacherResult");
+
+
+    if (!question) {
+
+        result.innerHTML = `
+            <div class="tool-result">
+
+                <h3>⚠️ Ask a question first</h3>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    result.innerHTML = `
+
+        <div class="tool-result">
+
+            <h3>
+                🤖 StudySpark Teacher
+            </h3>
+
+            <p>
+
+                Your question about
+                <strong>
+                    ${topic || "your topic"}
+                </strong>
+                is:
+
+            </p>
+
+            <p>
+                <strong>
+                    ${question}
+                </strong>
+            </p>
+
+            <hr>
+
+            <p>
+                💡 To answer this properly with
+                real AI, we'll connect StudySpark
+                to the AI backend in the next stage.
+            </p>
+
+        </div>
+
+    `;
+
+}
 
