@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>StudySpark AI</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav>
+        <h1>StudySpark AI</h1>
+
+        <button onclick="toggleTheme()">
+            🌙
+        </button>
+    </nav>
+
+    <main>
+
+        <section class="hero">
+            <h2>Study Smarter With AI</h2>
+
+            <p>
+                Turn your notes into summaries, quizzes and flashcards.
+            </p>
+        </section>
+
+        <section class="tools">
+
+            <div class="card">
+                <h3>📝 Summarize Notes</h3>
+
+                <textarea
+                    id="notes"
+                    placeholder="Paste your notes here...">
+                </textarea>
+
+                <button onclick="summarizeNotes()">
+                    Summarize
+                </button>
+
+                <div id="summary"></div>
+            </div>
+
+
+            <div class="card">
+
+                <h3>❓ Quiz Generator</h3>
+
+                <button onclick="generateQuiz()">
+                    Generate Quiz
+                </button>
+
+                <div id="quiz"></div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>🧠 Study Assistant</h3>
+
+                <input
+                    id="question"
+                    placeholder="Ask something..."
+                >
+
+                <button onclick="askAssistant()">
+                    Ask AI
+                </button>
+
+                <div id="answer"></div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
