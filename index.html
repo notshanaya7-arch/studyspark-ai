@@ -17,15 +17,37 @@
 
     <div id="intro">
 
-        <div class="spark spark1">✦</div>
-        <div class="spark spark2">✦</div>
-        <div class="spark spark3">✧</div>
-        <div class="spark spark4">✦</div>
-        <div class="spark spark5">✧</div>
+       <div id="intro">
+
+    <div class="intro-spark spark1">✦</div>
+    <div class="intro-spark spark2">✧</div>
+    <div class="intro-spark spark3">✦</div>
+    <div class="intro-spark spark4">✧</div>
+    <div class="intro-spark spark5">✦</div>
+
+    <div class="intro-content">
 
         <div class="intro-logo">
-            <span>StudySpark</span>
-            <strong> AI</strong>
+            StudySpark <span>AI</span>
+        </div>
+
+        <div class="intro-line"></div>
+
+        <p class="intro-tagline">
+            Learn Smarter. Achieve More.
+        </p>
+
+        <p class="creator-text">
+            ✨ Created by a 14 year old ✨
+        </p>
+
+        <h2 class="creator-name">
+            Shanaya Khan
+        </h2>
+
+    </div>
+
+</div>
         </div>
 
         <p class="intro-subtitle">
@@ -305,7 +327,114 @@
 
         </section>
 
+<!-- ========================= -->
+<!-- AI NOTES SUMMARIZER -->
+<!-- ========================= -->
 
+<section id="summarizer" class="study-tool-page">
+
+    <div class="tool-page-header">
+
+        <div class="tool-icon">
+            📝
+        </div>
+
+        <h2>AI Notes Summarizer</h2>
+
+        <p>
+            Upload your study material or paste your notes
+            and turn them into simple summaries.
+        </p>
+
+    </div>
+
+
+    <div class="summarizer-box">
+
+        <h3>📚 Add Your Study Material</h3>
+
+        <p class="upload-info">
+            Upload PDF, Word documents, images, audio or video.
+        </p>
+
+
+        <label class="upload-area">
+
+            <input
+                type="file"
+                id="studyFile"
+                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.mp3,.wav,.mp4,.mov"
+            >
+
+            <span class="upload-icon">📁</span>
+
+            <strong>Click to upload your file</strong>
+
+            <small>
+                PDF • DOCX • TXT • JPG • PNG • MP3 • MP4
+            </small>
+
+        </label>
+
+
+        <div class="or-divider">
+            OR
+        </div>
+
+
+        <textarea
+            id="studyNotes"
+            placeholder="Paste or type your notes here..."
+        ></textarea>
+
+
+        <div class="summary-options">
+
+            <label>
+                Summary length
+            </label>
+
+            <select id="summaryLength">
+
+                <option value="short">
+                    Short
+                </option>
+
+                <option value="medium" selected>
+                    Medium
+                </option>
+
+                <option value="detailed">
+                    Detailed
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="summarize-button"
+            onclick="summarizeNotes()"
+        >
+            ✨ Summarize with AI
+        </button>
+
+
+        <div id="summaryResult" class="summary-result">
+
+            <h3>✨ Your Summary</h3>
+
+            <p>
+                Your AI-generated summary will appear here.
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
         <!-- FOOTER -->
 
         <footer>
