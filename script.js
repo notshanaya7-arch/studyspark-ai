@@ -1605,3 +1605,511 @@ function getStudyMaterialName() {
     return studyMaterialName;
 
 }
+/* =====================================================
+   STUDYSPARK AI - UNIVERSAL STUDY MATERIAL UPLOADER
+   Adds Upload + Paste options to Quiz, Flashcards,
+   Study Assistant and AI Teacher
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* -------------------------------------------------
+       CREATE A REUSABLE UPLOAD BOX
+    ------------------------------------------------- */
+
+    function createStudyUploader(textareaId, title) {
+
+        const textarea = document.getElementById(textareaId);
+
+        if (!textarea) return;
+
+        /* Don't create it twice */
+        if (document.getElementById(textareaId + "-upload")) return;
+
+        const wrapper = document.createElement("div");
+
+        wrapper.id = textareaId + "-upload";
+
+        wrapper.className = "study-upload-box";
+
+        wrapper.innerHTML = `
+            
+            <div class="study-upload-title">
+                📚 ${title}
+            </div>
+
+            <div class="study-upload-subtitle">
+                Upload your study material OR paste your notes below.
+            </div>
+
+            <label class="study-upload-button">
+
+                📁 Upload File
+
+                <input
+                    type="file"
+                    class="study-material-file"
+                    accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.mp3,.wav,.mp4,.mov"
+                    hidden
+                >
+
+            </label>
+
+            <div class="study-file-name">
+                No file selected
+            </div>
+
+            <div class="study-or">
+                OR
+            </div>
+
+        `;
+
+        /* Put uploader directly BEFORE textarea */
+        textarea.parentNode.insertBefore(
+            wrapper,
+            textarea
+        );
+
+        const fileInput =
+            wrapper.querySelector(".study-material-file");
+
+        const fileName =
+            wrapper.querySelector(".study-file-name");
+
+        fileInput.addEventListener("change", function () {
+
+            if (!fileInput.files.length) return;
+
+            const file = fileInput.files[0];
+
+            fileName.textContent =
+                "📎 " + file.name;
+
+            /* Read text files automatically */
+            if (
+                file.type === "text/plain" ||
+                file.name.toLowerCase().endsWith(".txt")
+            ) {
+
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+
+                    textarea.value =
+                        event.target.result;
+
+                    textarea.dispatchEvent(
+                        new Event("input")
+                    );
+
+                };
+
+                reader.readAsText(file);
+
+            }
+
+            else {
+
+                fileName.textContent =
+                    "📎 " +
+                    file.name +
+                    " selected";
+
+            }
+
+        });
+
+    }
+
+
+    /* -------------------------------------------------
+       QUIZ
+    ------------------------------------------------- */
+
+    createStudyUploader(
+        "quizNotes",
+        "Add Material for Your Quiz"
+    );
+
+
+    /* -------------------------------------------------
+       FLASHCARDS
+    ------------------------------------------------- */
+
+    createStudyUploader(
+        "flashcardNotes",
+        "Add Material for Your Flashcards"
+    );
+
+
+    /* -------------------------------------------------
+       STUDY ASSISTANT
+    ------------------------------------------------- */
+
+    createStudyUploader(
+        "teacherQuestion",
+        "Add Material for Your Study Assistant"
+    );
+
+
+    /* -------------------------------------------------
+       AI TEACHER
+    ------------------------------------------------- */
+
+    createStudyUploader(
+        "teacherTopic2",
+        "Add Material for Your AI Teacher"
+    );
+
+});
+
+
+/* =====================================================
+   FILE READER FOR PDF / WORD / IMAGE / AUDIO / VIDEO
+===================================================== */
+
+function handleStudyFile(file, textarea) {
+
+    if (!file || !textarea) return;
+
+
+    /* TEXT FILE */
+
+    if (
+        file.type === "text/plain" ||
+        file.name.toLowerCase().endsWith(".txt")
+    ) {
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            textarea.value =
+                event.target.result;
+
+        };
+
+        reader.readAsText(file);
+
+        return;
+    }
+
+
+    /* OTHER FILE TYPES */
+
+    textarea.value =
+        `[Uploaded study material: ${file.name}]
+
+The file has been selected successfully.
+
+StudySpark AI can use this material when connected to an AI/document-processing service.`;
+
+}
+
+
+/* =====================================================
+   EXTRA UPLOADER FOR SUMMARIZER
+   IMPROVES THE EXISTING UPLOAD SYSTEM
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const studyFile =
+        document.getElementById("studyFile");
+
+    const studyNotes =
+        document.getElementById("studyNotes");
+
+    if (!studyFile || !studyNotes) return;
+
+
+    studyFile.addEventListener("change", function () {
+
+        if (!studyFile.files.length) return;
+
+        const file =
+            studyFile.files[0];
+
+
+        /* TEXT FILE */
+
+        if (
+            file.type === "text/plain" ||
+            file.name.toLowerCase().endsWith(".txt")
+        ) {
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                function (event) {
+
+                    studyNotes.value =
+                        event.target.result;
+
+                };
+
+            reader.readAsText(file);
+
+        }
+
+    });
+
+});
+
+
+/* =====================================================
+   MAKE UPLOADED FILES WORK WITH BUTTONS
+===================================================== */
+
+function getStudyMaterial(textareaId) {
+
+    const textarea =
+        document.getElementById(textareaId);
+
+    if (!textarea) return "";
+
+    return textarea.value.trim();
+
+}
+
+
+/* =====================================================
+   BETTER QUIZ MATERIAL CHECK
+===================================================== */
+
+const originalGenerateQuiz =
+    window.generateQuiz;
+
+window.generateQuiz = function () {
+
+    const notes =
+        getStudyMaterial("quizNotes");
+
+    const result =
+        document.getElementById("quizResult");
+
+    if (!notes) {
+
+        if (result) {
+
+            result.innerHTML = `
+
+                <div class="tool-result">
+
+                    <h3>📚 Add Your Study Material</h3>
+
+                    <p>
+                        Upload a file or paste your notes
+                        before creating the quiz.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+        return;
+
+    }
+
+
+    if (typeof originalGenerateQuiz === "function") {
+
+        originalGenerateQuiz();
+
+    }
+
+};
+
+
+/* =====================================================
+   BETTER FLASHCARD MATERIAL CHECK
+===================================================== */
+
+const originalCreateFlashcards =
+    window.createFlashcards;
+
+window.createFlashcards = function () {
+
+    const notes =
+        getStudyMaterial("flashcardNotes");
+
+    const result =
+        document.getElementById("flashcardResult");
+
+
+    if (!notes) {
+
+        if (result) {
+
+            result.innerHTML = `
+
+                <div class="tool-result">
+
+                    <h3>📚 Add Your Study Material</h3>
+
+                    <p>
+                        Upload a file or paste your notes
+                        before creating flashcards.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+        return;
+
+    }
+
+
+    if (
+        typeof originalCreateFlashcards ===
+        "function"
+    ) {
+
+        originalCreateFlashcards();
+
+    }
+
+};
+
+
+/* =====================================================
+   STUDYSPARK UPLOADER STYLING
+===================================================== */
+
+const studyUploaderStyle =
+document.createElement("style");
+
+studyUploaderStyle.innerHTML = `
+
+.study-upload-box {
+
+    margin-bottom: 18px;
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    border: 2px dashed #7567ff;
+
+    background: rgba(117, 103, 255, 0.06);
+
+    text-align: center;
+
+}
+
+
+.study-upload-title {
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    margin-bottom: 6px;
+
+}
+
+
+.study-upload-subtitle {
+
+    font-size: 14px;
+
+    color: #777;
+
+    margin-bottom: 15px;
+
+}
+
+
+.study-upload-button {
+
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    border-radius: 12px;
+
+    background: #7567ff;
+
+    color: white;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.study-upload-button:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px
+        rgba(117,103,255,0.25);
+
+}
+
+
+.study-file-name {
+
+    margin-top: 12px;
+
+    font-size: 14px;
+
+    color: #666;
+
+    word-break: break-word;
+
+}
+
+
+.study-or {
+
+    margin-top: 15px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #999;
+
+}
+
+
+body.dark .study-upload-box {
+
+    background: rgba(117,103,255,0.12);
+
+    border-color: #9b8cff;
+
+}
+
+
+body.dark .study-upload-subtitle,
+
+body.dark .study-file-name {
+
+    color: #c5c5d5;
+
+}
+
+`;
+
+
+document.head.appendChild(
+    studyUploaderStyle
+);
+
+
+/* =====================================================
+   END
+===================================================== */
