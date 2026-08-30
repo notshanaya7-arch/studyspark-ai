@@ -1,7 +1,3 @@
-/* =========================
-   BASIC SETTINGS
-========================= */
-
 * {
     margin: 0;
     padding: 0;
@@ -16,10 +12,11 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     background: #f6f7ff;
     color: #202033;
-    transition: background 0.4s, color 0.4s;
 }
+
+
 /* =========================
-   STUDYSPARK INTRO
+   ANIMATED INTRO
 ========================= */
 
 #intro {
@@ -33,11 +30,11 @@ body {
 
     overflow: hidden;
 
-    background:
-        radial-gradient(circle at center, #211653 0%, #090714 55%, #030208 100%);
+    background: #101024;
 
-    animation: introFadeOut 1s ease 5.5s forwards;
+    animation: introDisappear 1s ease 5.5s forwards;
 }
+
 
 .intro-content {
     text-align: center;
@@ -45,85 +42,90 @@ body {
     z-index: 2;
 }
 
+
+/* STUDYSPARK LOGO */
+
 .intro-logo {
-    font-size: clamp(55px, 10vw, 120px);
-    font-weight: 900;
-    letter-spacing: -5px;
+    font-size: clamp(45px, 8vw, 100px);
+    font-weight: 800;
+
+    letter-spacing: -4px;
 
     color: white;
 
-    text-shadow:
-        0 0 10px #9b7cff,
-        0 0 30px #7b5cff,
-        0 0 70px #6c4dff;
-
-    animation: studySparkFly 2s cubic-bezier(.17,.67,.25,1.2);
+    animation:
+        logoFly 1.8s cubic-bezier(.17,.67,.25,1.2);
 }
+
 
 .intro-logo span {
-    color: #a98cff;
+    color: #9b8cff;
 }
+
+
+/* LINE */
 
 .intro-line {
     width: 0;
     height: 3px;
+
     margin: 20px auto;
 
-    background: #a98cff;
+    background: #9b8cff;
 
-    box-shadow:
-        0 0 10px #a98cff,
-        0 0 25px #7b5cff;
+    border-radius: 10px;
 
     animation: lineGrow 1s ease 1.5s forwards;
 }
 
+
+/* TAGLINE */
+
 .intro-tagline {
-    color: #ddd6ff;
-    font-size: 20px;
-    letter-spacing: 2px;
+    color: #c9c5ff;
 
-    opacity: 0;
-
-    animation: fadeUp 1s ease 2s forwards;
-}
-
-.creator-text {
-    margin-top: 55px;
-
-    color: #cfc5ff;
-    font-size: 17px;
-
-    opacity: 0;
-
-    animation: fadeUp 1s ease 3s forwards;
-}
-
-.creator-name {
-    margin-top: 10px;
-
-    font-size: clamp(35px, 6vw, 65px);
-
-    font-weight: 700;
-
-    font-family: cursive;
-
-    color: #ffffff;
-
-    text-shadow:
-        0 0 10px #ff8cff,
-        0 0 30px #c45cff,
-        0 0 60px #8c4dff;
+    font-size: 18px;
 
     opacity: 0;
 
     animation:
-        creatorAppear 1.2s ease 3.5s forwards,
-        creatorGlow 2s ease-in-out 4.7s infinite alternate;
+        subtitleAppear 1s ease 2s forwards;
 }
 
 
-/* SPARKLES */
+/* CREATOR */
+
+.creator-text {
+    margin-top: 35px;
+
+    color: white;
+
+    font-size: 17px;
+
+    opacity: 0;
+
+    animation:
+        creatorAppear 1s ease 2.8s forwards;
+}
+
+
+.creator-name {
+    margin-top: 10px;
+
+    font-size: 28px;
+
+    color: #9b8cff;
+
+    opacity: 0;
+
+    animation:
+        creatorNameAppear 1s ease 3.3s forwards;
+}
+
+
+/* =========================
+   SPARKLES
+========================= */
 
 .intro-spark {
     position: absolute;
@@ -134,62 +136,79 @@ body {
 
     opacity: 0;
 
-    text-shadow:
-        0 0 10px #ffffff,
-        0 0 25px #9b7cff;
-
-    animation: sparkleAppear 2s ease-in-out infinite;
+    animation: sparkle 2.5s ease-in-out infinite;
 }
+
 
 .spark1 {
-    top: 15%;
-    left: 15%;
+    top: 20%;
+    left: 20%;
+    animation-delay: .2s;
 }
+
 
 .spark2 {
-    top: 25%;
-    right: 15%;
-    animation-delay: .5s;
+    top: 30%;
+    right: 20%;
+    animation-delay: .7s;
 }
 
+
 .spark3 {
-    bottom: 20%;
-    left: 25%;
+    bottom: 25%;
+    left: 28%;
     animation-delay: 1s;
 }
 
+
 .spark4 {
-    bottom: 15%;
-    right: 25%;
-    animation-delay: 1.5s;
+    bottom: 20%;
+    right: 30%;
+    animation-delay: 1.4s;
 }
+
 
 .spark5 {
-    top: 12%;
+    top: 15%;
     right: 40%;
-    animation-delay: .8s;
+    animation-delay: 1.8s;
 }
 
 
-/* ANIMATIONS */
+/* =========================
+   INTRO ANIMATIONS
+========================= */
 
-@keyframes studySparkFly {
+@keyframes logoFly {
 
     0% {
-        transform: translateX(-120vw) scale(.3) rotate(-15deg);
+        transform:
+            translateX(-100vw)
+            scale(.4)
+            rotate(-10deg);
+
         opacity: 0;
     }
 
     60% {
-        transform: translateX(30px) scale(1.08) rotate(2deg);
+        transform:
+            translateX(40px)
+            scale(1.1)
+            rotate(2deg);
+
         opacity: 1;
     }
 
     100% {
-        transform: translateX(0) scale(1) rotate(0);
+        transform:
+            translateX(0)
+            scale(1)
+            rotate(0);
+
         opacity: 1;
     }
 }
+
 
 @keyframes lineGrow {
 
@@ -198,15 +217,16 @@ body {
     }
 
     to {
-        width: 280px;
+        width: 180px;
     }
 }
 
-@keyframes fadeUp {
+
+@keyframes subtitleAppear {
 
     from {
         opacity: 0;
-        transform: translateY(25px);
+        transform: translateY(20px);
     }
 
     to {
@@ -215,34 +235,40 @@ body {
     }
 }
 
+
 @keyframes creatorAppear {
 
     from {
         opacity: 0;
-        transform: scale(.5) translateY(30px);
+        transform: translateY(20px);
     }
 
     to {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: translateY(0);
     }
 }
 
-@keyframes creatorGlow {
+
+@keyframes creatorNameAppear {
 
     from {
-        transform: scale(1);
+        opacity: 0;
+        transform: scale(.7);
     }
 
     to {
-        transform: scale(1.04);
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
-@keyframes sparkleAppear {
 
-    0% {
-        transform: scale(0) rotate(0);
+@keyframes sparkle {
+
+    0%,
+    100% {
+        transform: scale(0) rotate(0deg);
         opacity: 0;
     }
 
@@ -250,15 +276,10 @@ body {
         transform: scale(1.5) rotate(180deg);
         opacity: 1;
     }
-
-    100% {
-        transform: scale(0) rotate(360deg);
-        opacity: 0;
-    }
 }
 
-@keyframes introFadeOut 
 
+@keyframes introDisappear {
 
     to {
         opacity: 0;
@@ -292,7 +313,7 @@ nav {
 
     padding: 18px 7%;
 
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255,255,255,.9);
 
     backdrop-filter: blur(15px);
 
@@ -319,18 +340,18 @@ nav {
 
 nav button {
     border: none;
+
     padding: 10px 15px;
 
     border-radius: 10px;
 
     background: #7567ff;
+
     color: white;
 
     cursor: pointer;
 
     font-weight: bold;
-
-    transition: transform 0.2s;
 }
 
 
@@ -394,7 +415,7 @@ nav button:hover {
 
     font-weight: bold;
 
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 20px rgba(0,0,0,.08);
 
     margin-bottom: 25px;
 }
@@ -448,21 +469,17 @@ nav button:hover {
 
     cursor: pointer;
 
-    box-shadow: 0 12px 30px rgba(117, 103, 255, 0.3);
-
-    transition: transform 0.25s, box-shadow 0.25s;
+    box-shadow: 0 12px 30px rgba(117,103,255,.3);
 }
 
 
 .start-button:hover {
     transform: translateY(-5px);
-
-    box-shadow: 0 18px 35px rgba(117, 103, 255, 0.4);
 }
 
 
 /* =========================
-   TOOLS SECTION
+   TOOLS
 ========================= */
 
 #tools {
@@ -488,10 +505,6 @@ nav button:hover {
 }
 
 
-/* =========================
-   TOOL GRID
-========================= */
-
 .tools-grid {
     max-width: 1250px;
 
@@ -500,7 +513,7 @@ nav button:hover {
     display: grid;
 
     grid-template-columns:
-        repeat(auto-fit, minmax(270px, 1fr));
+        repeat(auto-fit, minmax(270px,1fr));
 
     gap: 25px;
 }
@@ -517,18 +530,18 @@ nav button:hover {
 
     border: 1px solid #ececf5;
 
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.06);
 
-    transition:
-        transform 0.3s,
-        box-shadow 0.3s;
+    transition: .3s;
 }
 
 
 .tool-card:hover {
     transform: translateY(-8px);
 
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.1);
+    box-shadow:
+        0 20px 45px rgba(0,0,0,.1);
 }
 
 
@@ -569,13 +582,213 @@ nav button:hover {
     cursor: pointer;
 
     font-weight: bold;
-
-    transition: transform 0.2s;
 }
 
 
-.tool-card button:hover {
-    transform: translateY(-2px);
+/* =========================
+   STUDY TOOL PAGES
+========================= */
+
+.study-tool-page {
+    padding: 90px 7%;
+
+    text-align: center;
+
+    min-height: 500px;
+}
+
+
+.tool-page-header {
+    max-width: 700px;
+
+    margin: auto auto 40px;
+}
+
+
+.tool-page-header h2 {
+    font-size: 40px;
+
+    margin-bottom: 15px;
+}
+
+
+.tool-page-header p {
+    color: #73738a;
+
+    font-size: 18px;
+}
+
+
+/* =========================
+   SUMMARIZER
+========================= */
+
+.summarizer-box {
+    max-width: 900px;
+
+    margin: auto;
+
+    padding: 40px;
+
+    background: white;
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.08);
+}
+
+
+.upload-area {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    min-height: 160px;
+
+    margin-top: 20px;
+
+    padding: 25px;
+
+    border: 2px dashed #7567ff;
+
+    border-radius: 18px;
+
+    cursor: pointer;
+}
+
+
+.upload-area input {
+    display: none;
+}
+
+
+.upload-icon {
+    font-size: 40px;
+}
+
+
+.upload-area strong {
+    color: #7567ff;
+}
+
+
+.upload-area small {
+    color: #777;
+}
+
+
+.or-divider {
+    margin: 25px;
+
+    color: #888;
+
+    font-weight: bold;
+}
+
+
+#studyNotes,
+#quizNotes {
+    width: 100%;
+
+    min-height: 220px;
+
+    padding: 20px;
+
+    border: 1px solid #ddddeb;
+
+    border-radius: 15px;
+
+    resize: vertical;
+
+    font-family: Arial;
+
+    font-size: 16px;
+}
+
+
+.summary-options,
+.quiz-options {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    margin: 25px 0;
+}
+
+
+.summary-options select,
+.quiz-options select {
+    padding: 10px 15px;
+
+    border-radius: 10px;
+
+    border: 1px solid #ddd;
+}
+
+
+.summarize-button {
+    border: none;
+
+    padding: 14px 25px;
+
+    border-radius: 12px;
+
+    background: #7567ff;
+
+    color: white;
+
+    font-weight: bold;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+
+.summary-result,
+.quiz-result {
+    margin-top: 30px;
+
+    padding: 25px;
+
+    text-align: left;
+
+    background: #f7f6ff;
+
+    border-left: 5px solid #7567ff;
+
+    border-radius: 15px;
+}
+
+
+/* =========================
+   QUIZ
+========================= */
+
+.quiz-box {
+    max-width: 900px;
+
+    margin: auto;
+
+    padding: 40px;
+
+    background: white;
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.08);
 }
 
 
@@ -627,7 +840,7 @@ body.dark {
 
 
 body.dark nav {
-    background: rgba(16, 16, 36, 0.9);
+    background: rgba(16,16,36,.9);
 
     border-color: #292943;
 }
@@ -635,17 +848,21 @@ body.dark nav {
 
 body.dark .hero {
     background:
-        radial-gradient(circle at top left, #25204b, transparent 35%),
-        radial-gradient(circle at bottom right, #172d3c, transparent 35%);
+        radial-gradient(circle at top left,#25204b,transparent 35%),
+        radial-gradient(circle at bottom right,#172d3c,transparent 35%);
 }
 
 
-body.dark .hero p {
+body.dark .hero p,
+body.dark .section-description,
+body.dark .tool-page-header p {
     color: #c2c2d4;
 }
 
 
-body.dark .tool-card {
+body.dark .tool-card,
+body.dark .summarizer-box,
+body.dark .quiz-box {
     background: #19192f;
 
     border-color: #30304c;
@@ -657,13 +874,13 @@ body.dark .tool-card p {
 }
 
 
-body.dark .badge {
-    background: #19192f;
-}
+body.dark #studyNotes,
+body.dark #quizNotes {
+    background: #14142a;
 
+    color: white;
 
-body.dark .section-description {
-    color: #b9b9cd;
+    border-color: #383852;
 }
 
 
@@ -677,41 +894,43 @@ body.dark .section-description {
         padding: 15px 5%;
     }
 
-
-    .logo {
-        font-size: 20px;
+    .nav-buttons {
+        gap: 5px;
     }
 
+    nav button {
+        padding: 8px 10px;
+    }
 
     .hero {
         min-height: 550px;
-
-        padding: 60px 20px;
     }
-
 
     .hero h1 {
         letter-spacing: -2px;
     }
 
-
     .hero p {
         font-size: 17px;
     }
 
-
-    #tools {
+    #tools,
+    .study-tool-page {
         padding: 65px 5%;
     }
-
 
     #tools h2 {
         font-size: 32px;
     }
 
-
-    .tool-card {
+    .summarizer-box,
+    .quiz-box {
         padding: 25px;
+    }
+
+    .summary-options,
+    .quiz-options {
+        flex-direction: column;
     }
 
 }
