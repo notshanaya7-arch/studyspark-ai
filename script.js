@@ -1481,4 +1481,127 @@ function askTeacher() {
     `;
 
 }
+/* =====================================================
+   S14 - UNIVERSAL STUDY MATERIAL
+   One upload for all StudySpark tools
+===================================================== */
 
+let studyMaterialFile = null;
+let studyMaterialName = "";
+let studyMaterialType = "";
+let studyMaterialSize = 0;
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const fileInput = document.getElementById("studyFile");
+    const fileName = document.getElementById("fileName");
+    const fileInfo = document.getElementById("fileInfo");
+    const materialStatus = document.getElementById("materialStatus");
+
+    if (!fileInput) return;
+
+    fileInput.addEventListener("change", function () {
+
+        const file = fileInput.files[0];
+
+        if (!file) {
+            studyMaterialFile = null;
+            studyMaterialName = "";
+            studyMaterialType = "";
+            studyMaterialSize = 0;
+
+            if (fileName) {
+                fileName.textContent = "No file selected";
+            }
+
+            if (fileInfo) {
+                fileInfo.textContent =
+                    "Upload something to start studying";
+            }
+
+            if (materialStatus) {
+                materialStatus.innerHTML =
+                    "<span>●</span> No study material uploaded yet.";
+            }
+
+            return;
+        }
+
+        /* Save the uploaded material globally */
+
+        studyMaterialFile = file;
+        studyMaterialName = file.name;
+        studyMaterialType = file.type;
+        studyMaterialSize = file.size;
+
+
+        /* Show file name */
+
+        if (fileName) {
+            fileName.textContent = file.name;
+        }
+
+
+        /* Show file information */
+
+        if (fileInfo) {
+
+            const sizeMB =
+                (file.size / (1024 * 1024)).toFixed(2);
+
+            fileInfo.textContent =
+                `${file.type || "Study material"} • ${sizeMB} MB`;
+
+        }
+
+
+        /* Show connected status */
+
+        if (materialStatus) {
+
+            materialStatus.innerHTML =
+                "<span>●</span> Study material ready for Summarizer, Quiz AI, Flashcards and AI Teacher.";
+
+        }
+
+        console.log(
+            "StudySpark material loaded:",
+            file.name
+        );
+
+    });
+
+});
+
+
+/* =====================================================
+   GET CURRENT STUDY MATERIAL
+===================================================== */
+
+function getStudyMaterial() {
+
+    return studyMaterialFile;
+
+}
+
+
+/* =====================================================
+   CHECK WHETHER MATERIAL EXISTS
+===================================================== */
+
+function hasStudyMaterial() {
+
+    return studyMaterialFile !== null;
+
+}
+
+
+/* =====================================================
+   GET MATERIAL NAME
+===================================================== */
+
+function getStudyMaterialName() {
+
+    return studyMaterialName;
+
+}
