@@ -18,58 +18,258 @@ body {
     color: #202033;
     transition: background 0.4s, color 0.4s;
 }
-
-
 /* =========================
-   ANIMATED INTRO
+   STUDYSPARK INTRO
 ========================= */
 
 #intro {
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    z-index: 99999;
 
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
 
     overflow: hidden;
 
-    background: #101024;
+    background:
+        radial-gradient(circle at center, #211653 0%, #090714 55%, #030208 100%);
 
-    animation: introDisappear 1s ease 3.2s forwards;
+    animation: introFadeOut 1s ease 5.5s forwards;
 }
 
+.intro-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
 
 .intro-logo {
-    font-size: clamp(45px, 8vw, 100px);
-    font-weight: 800;
-    letter-spacing: -4px;
+    font-size: clamp(55px, 10vw, 120px);
+    font-weight: 900;
+    letter-spacing: -5px;
 
-    animation: logoFly 1.8s cubic-bezier(.17,.67,.25,1.2);
+    color: white;
+
+    text-shadow:
+        0 0 10px #9b7cff,
+        0 0 30px #7b5cff,
+        0 0 70px #6c4dff;
+
+    animation: studySparkFly 2s cubic-bezier(.17,.67,.25,1.2);
 }
-
 
 .intro-logo span {
-    color: white;
+    color: #a98cff;
 }
 
+.intro-line {
+    width: 0;
+    height: 3px;
+    margin: 20px auto;
 
-.intro-logo strong {
-    color: #9b8cff;
+    background: #a98cff;
+
+    box-shadow:
+        0 0 10px #a98cff,
+        0 0 25px #7b5cff;
+
+    animation: lineGrow 1s ease 1.5s forwards;
 }
 
-
-.intro-subtitle {
-    color: #c9c5ff;
-    font-size: 18px;
-    margin-top: 15px;
+.intro-tagline {
+    color: #ddd6ff;
+    font-size: 20px;
+    letter-spacing: 2px;
 
     opacity: 0;
 
-    animation: subtitleAppear 1s ease 1.4s forwards;
+    animation: fadeUp 1s ease 2s forwards;
 }
+
+.creator-text {
+    margin-top: 55px;
+
+    color: #cfc5ff;
+    font-size: 17px;
+
+    opacity: 0;
+
+    animation: fadeUp 1s ease 3s forwards;
+}
+
+.creator-name {
+    margin-top: 10px;
+
+    font-size: clamp(35px, 6vw, 65px);
+
+    font-weight: 700;
+
+    font-family: cursive;
+
+    color: #ffffff;
+
+    text-shadow:
+        0 0 10px #ff8cff,
+        0 0 30px #c45cff,
+        0 0 60px #8c4dff;
+
+    opacity: 0;
+
+    animation:
+        creatorAppear 1.2s ease 3.5s forwards,
+        creatorGlow 2s ease-in-out 4.7s infinite alternate;
+}
+
+
+/* SPARKLES */
+
+.intro-spark {
+    position: absolute;
+
+    color: white;
+
+    font-size: 30px;
+
+    opacity: 0;
+
+    text-shadow:
+        0 0 10px #ffffff,
+        0 0 25px #9b7cff;
+
+    animation: sparkleAppear 2s ease-in-out infinite;
+}
+
+.spark1 {
+    top: 15%;
+    left: 15%;
+}
+
+.spark2 {
+    top: 25%;
+    right: 15%;
+    animation-delay: .5s;
+}
+
+.spark3 {
+    bottom: 20%;
+    left: 25%;
+    animation-delay: 1s;
+}
+
+.spark4 {
+    bottom: 15%;
+    right: 25%;
+    animation-delay: 1.5s;
+}
+
+.spark5 {
+    top: 12%;
+    right: 40%;
+    animation-delay: .8s;
+}
+
+
+/* ANIMATIONS */
+
+@keyframes studySparkFly {
+
+    0% {
+        transform: translateX(-120vw) scale(.3) rotate(-15deg);
+        opacity: 0;
+    }
+
+    60% {
+        transform: translateX(30px) scale(1.08) rotate(2deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(0) scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes lineGrow {
+
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 280px;
+    }
+}
+
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes creatorAppear {
+
+    from {
+        opacity: 0;
+        transform: scale(.5) translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes creatorGlow {
+
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.04);
+    }
+}
+
+@keyframes sparkleAppear {
+
+    0% {
+        transform: scale(0) rotate(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes introFadeOut {
+
+    to {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+
+
+
+
 
 
 /* =========================
