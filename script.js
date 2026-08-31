@@ -1,1180 +1,1224 @@
-/* =====================================================
-   STUDYSPARK AI
-   REAL STUDY WEBSITE JAVASCRIPT
-===================================================== */
+/* =========================================
+   STUDYSPARK AI - MAIN JAVASCRIPT
+========================================= */
 
 
-/* =====================================================
-   GLOBAL STATE
-===================================================== */
-
-let currentQuiz = [];
-let currentQuestion = 0;
-let userAnswers = [];
-let quizScore = 0;
-
-
-/* =====================================================
-   DARK MODE
-===================================================== */
-
-function toggleTheme() {
-    document.body.classList.toggle("dark");
-
-    localStorage.setItem(
-        "studySparkDarkMode",
-        document.body.classList.contains("dark")
-    );
-}
-
-
-/* Restore dark mode */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const darkMode =
-        localStorage.getItem("studySparkDarkMode");
-
-    if (darkMode === "true") {
-        document.body.classList.add("dark");
-    }
-
-});
-
-
-/* =====================================================
+/* =========================================
    NAVIGATION
-===================================================== */
+========================================= */
 
-function scrollToTools() {
+function goTo(id) {
 
-    const tools =
-        document.getElementById("tools");
+    const element = document.getElementById(id);
 
-    if (tools) {
-        tools.scrollIntoView({
+    if (element) {
+        element.scrollIntoView({
             behavior: "smooth"
         });
     }
+
+}
+
+function goHome() {
+    goTo("home");
 }
 
 
-function showHome() {
+/* =========================================
+   DARK MODE
+========================================= */
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+function toggleDark() {
+
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+        "studySparkDark",
+        document.body.classList.contains("dark")
+    );
+
+}
+
+if (localStorage.getItem("studySparkDark") === "true") {
+    document.body.classList.add("dark");
+}
+
+
+/* =========================================
+   FILE UPLOAD SYSTEM
+========================================= */
+
+function setupFile(inputId, textareaId, nameId) {
+
+    const input = document.getElementById(inputId);
+    const textarea = document.getElementById(textareaId);
+    const fileName = document.getElementById(nameId);
+
+    if (!input || !textarea) return;
+
+    input.addEventListener("change", function () {
+
+        const file = input.files[0];
+
+        if (!file) return;
+
+        if (fileName) {
+            fileName.textContent = "📎 " + file.name;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            textarea.value = event.target.result;
+
+        };
+
+        reader.readAsText(file);
+
     });
 
 }
 
 
-function openTool(tool) {
+/* Uploaders for every feature */
 
-    if (tool === "summarizer") {
+setupFile(
+    "summaryFile",
+    "summaryNotes",
+    "summaryFileName"
+);
 
-        document
-            .getElementById("summarizer")
-            .scrollIntoView({
-                behavior: "smooth"
-            });
+setupFile(
+    "quizFile",
+    "quizNotes",
+    "quizFileName"
+);
 
-        return;
-    }
+setupFile(
+    "flashcardFile",
+    "flashcardNotes",
+    "flashcardFileName"
+);
+
+setupFile(
+    "teacherFile",
+    "teacherNotes",
+    "teacherFileName"
+);
+
+setupFile(
+    "assistantFile",
+    "assistantNotes",
+    "assistantFileName"
+);
 
 
-    if (tool === "quiz") {
+/* =========================================
+   TEXT HELPERS
+========================================= */
 
-        document
-            .getElementById("quiz")
-            .scrollIntoView({
-                behavior: "smooth"
-            });
+function cleanText(text) {
 
-        return;
-    }
+    return text
+        .replace(/\s+/g, " ")
+        .trim();
 
+}
 
-    alert(
-        "🚀 " +
-        tool +
-        " is coming soon!"
-    );
+function getSentences(text) {
+
+    return text
+        .split(/[.!?]+/)
+        .map(sentence => sentence.trim())
+        .filter(sentence => sentence.length > 15);
+
+}
+
+function getWords(text) {
+
+    return cleanText(text)
+        .split(/\s+/)
+        .filter(Boolean);
+
 }
 
 
-/* =====================================================
-   NOTES SUMMARIZER
-===================================================== */
+/* =========================================
+   HTML SAFETY
+========================================= */
+
+function escapeHTML(text) {
+
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================================
+   AI SUMMARIZER
+========================================= */
 
 function summarizeNotes() {
 
-    const notes =
-        document
-        .getElementById("studyNotes")
-        .value
-        .trim();
-
+    const textarea =
+        document.getElementById("summaryNotes");
 
     const result =
-        document
-        .getElementById("summaryResult");
+        document.getElementById("summaryResult");
 
+    const text = textarea.value.trim();
 
-    if (!notes) {
+    if (!text) {
 
         result.innerHTML = `
-            <h3>⚠️ No notes yet</h3>
-
+            <h3>📚 Add Your Notes First</h3>
             <p>
-                Paste your notes above first.
+                Upload a file or paste your notes above.
             </p>
         `;
 
         return;
+
     }
 
+    const sentenceList = getSentences(text);
 
-    const sentences =
-        notes
-        .split(/[.!?]+/)
-        .map(s => s.trim())
-        .filter(s => s.length > 20);
+    let summary = sentenceList.slice(0, 8);
 
-
-    const length =
-        document
-        .getElementById("summaryLength")
-        .value;
-
-
-    let amount = 3;
-
-
-    if (length === "short") {
-        amount = 2;
+    if (summary.length === 0) {
+        summary = [text];
     }
-
-
-    if (length === "detailed") {
-        amount = 7;
-    }
-
-
-    const selected =
-        sentences.slice(0, amount);
-
 
     result.innerHTML = `
 
         <h3>✨ Your Summary</h3>
 
-        <p>
-            ${selected.join(". ")}.
+        <ul style="
+            padding-left:20px;
+            line-height:1.8;
+        ">
+
+            ${summary.map(sentence => `
+                <li>
+                    ${escapeHTML(sentence)}.
+                </li>
+            `).join("")}
+
+        </ul>
+
+        <p style="margin-top:20px;">
+            💡 Read these key points once,
+            then try explaining them without looking.
         </p>
 
-        <small>
-            StudySpark AI
-        </small>
-
     `;
+
+    addProgress();
+
 }
 
 
-/* =====================================================
-   FILE UPLOAD
-===================================================== */
+/* =========================================
+   QUIZ GENERATOR
+========================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        const fileInput =
-            document.getElementById("studyFile");
+let currentQuiz = [];
 
 
-        const uploadText =
-            document.querySelector(
-                ".upload-area strong"
-            );
+function generateQuiz() {
+
+    const textarea =
+        document.getElementById("quizNotes");
+
+    const result =
+        document.getElementById("quizResult");
+
+    const count =
+        Number(
+            document.getElementById("questionCount").value
+        );
+
+    const text = textarea.value.trim();
+
+    if (!text) {
+
+        result.innerHTML = `
+
+            <div class="result-box">
+
+                <h3>📚 Add Your Notes First</h3>
+
+                <p>
+                    Upload a file or paste your notes
+                    before creating the quiz.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
 
 
-        if (
-            fileInput &&
-            uploadText
+    let sentenceList = getSentences(text);
+
+
+    /*
+       If the notes have very few sentences,
+       create smaller sections from the words.
+    */
+
+    if (sentenceList.length < 3) {
+
+        const allWords = getWords(text);
+
+        sentenceList = [];
+
+        for (
+            let i = 0;
+            i < allWords.length;
+            i += 12
         ) {
 
-            fileInput.addEventListener(
-                "change",
-                () => {
-
-                    if (
-                        fileInput.files.length
-                    ) {
-
-                        const file =
-                            fileInput.files[0];
-
-
-                        uploadText.textContent =
-                            "📎 " +
-                            file.name;
-
-                    }
-
-                }
+            sentenceList.push(
+                allWords.slice(i, i + 12).join(" ")
             );
 
         }
 
     }
-);
 
-
-/* =====================================================
-   QUIZ GENERATOR
-===================================================== */
-
-function generateQuiz() {
-
-    const notesBox =
-        document
-        .getElementById("quizNotes");
-
-
-    const result =
-        document
-        .getElementById("quizResult");
-
-
-    const countBox =
-        document
-        .getElementById("questionCount");
-
-
-    const notes =
-        notesBox.value.trim();
-
-
-    if (!notes) {
-
-        result.innerHTML = `
-
-            <h3>⚠️ Add your study material</h3>
-
-            <p>
-                Paste your notes or topic
-                before generating your quiz.
-            </p>
-
-        `;
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       Extract meaningful sentences
-    --------------------------------------------- */
-
-    let sentences =
-        notes
-        .replace(/\n+/g, " ")
-        .split(/[.!?]+/)
-        .map(s => s.trim())
-        .filter(
-            s => s.length >= 25
-        );
-
-
-    if (sentences.length < 3) {
-
-        result.innerHTML = `
-
-            <h3>⚠️ More information needed</h3>
-
-            <p>
-                Add more detailed notes so
-                StudySpark can create different
-                questions.
-            </p>
-
-        `;
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       Shuffle sentences
-    --------------------------------------------- */
-
-    sentences =
-        shuffleArray(sentences);
-
-
-    const requested =
-        parseInt(
-            countBox.value
-        );
-
-
-    const amount =
-        Math.min(
-            requested,
-            sentences.length
-        );
-
-
-    /* ---------------------------------------------
-       Build DIFFERENT question types
-    --------------------------------------------- */
 
     currentQuiz = [];
 
 
-    for (
-        let i = 0;
-        i < amount;
-        i++
-    ) {
-
-        const sentence =
-            sentences[i];
+    const total =
+        Math.min(count, sentenceList.length);
 
 
-        const words =
+    for (let i = 0; i < total; i++) {
+
+        const sentence = sentenceList[i];
+
+        const wordList =
             sentence
-            .split(/\s+/)
-            .filter(
-                word =>
-                    word.length > 4
+                .replace(/[,.!?]/g, "")
+                .split(" ")
+                .filter(word => word.length > 4);
+
+
+        if (wordList.length === 0) {
+            continue;
+        }
+
+
+        /*
+           Pick a different important word
+           for each question.
+        */
+
+        const answer =
+            wordList[i % wordList.length];
+
+
+        const question =
+            sentence.replace(
+                new RegExp(
+                    "\\b" +
+                    answer.replace(
+                        /[.*+?^${}()|[\]\\]/g,
+                        "\\$&"
+                    ) +
+                    "\\b",
+                    "i"
+                ),
+                "_____"
             );
 
 
-        let answer =
-            words.length
-            ? words[
-                Math.floor(
-                    Math.random() *
-                    words.length
-                )
-            ]
-            : sentence;
+        const wrongAnswers = [];
 
 
-        answer =
-            answer
-            .replace(
-                /[^a-zA-Z0-9]/g,
-                ""
+        for (let j = 1; j < wordList.length; j++) {
+
+            const wrong =
+                wordList[
+                    (i + j) % wordList.length
+                ];
+
+            if (
+                wrong.toLowerCase() !==
+                answer.toLowerCase() &&
+                !wrongAnswers.includes(wrong)
+            ) {
+
+                wrongAnswers.push(wrong);
+
+            }
+
+            if (wrongAnswers.length >= 3) {
+                break;
+            }
+
+        }
+
+
+        while (wrongAnswers.length < 3) {
+
+            wrongAnswers.push(
+                "Not mentioned"
             );
 
+        }
 
-        const questionTypes = [
-            "definition",
-            "mainIdea",
-            "trueFalse",
-            "keyword"
+
+        let options = [
+            answer,
+            ...wrongAnswers
         ];
 
 
-        const type =
-            questionTypes[
-                i %
-                questionTypes.length
+        /* Shuffle answers */
+
+        for (
+            let j = options.length - 1;
+            j > 0;
+            j--
+        ) {
+
+            const random =
+                Math.floor(
+                    Math.random() * (j + 1)
+                );
+
+            [
+                options[j],
+                options[random]
+            ] =
+            [
+                options[random],
+                options[j]
             ];
-
-
-        let question;
-
-
-        if (type === "definition") {
-
-            question =
-                `Which concept is described by: "${sentence}"?`;
-
-        }
-
-
-        else if (
-            type === "mainIdea"
-        ) {
-
-            question =
-                `What is the main idea of this statement: "${sentence}"?`;
-
-        }
-
-
-        else if (
-            type === "trueFalse"
-        ) {
-
-            question =
-                `True or False: "${sentence}".`;
-
-        }
-
-
-        else {
-
-            question =
-                `Which important term appears in this idea: "${sentence}"?`;
 
         }
 
 
         currentQuiz.push({
 
-            question:
-                question,
+            question: question,
 
-            answer:
-                answer,
+            answer: answer,
 
-            original:
-                sentence,
-
-            type:
-                type
+            options: options
 
         });
 
     }
 
 
-    currentQuestion = 0;
-
-    userAnswers = [];
-
-    quizScore = 0;
-
-
-    showQuizQuestion();
+    renderQuiz();
 
 }
 
 
-/* =====================================================
-   SHOW QUESTION
-===================================================== */
-
-function showQuizQuestion() {
+function renderQuiz() {
 
     const result =
-        document
-        .getElementById("quizResult");
+        document.getElementById("quizResult");
 
 
-    if (
-        currentQuestion >=
-        currentQuiz.length
-    ) {
+    if (currentQuiz.length === 0) {
 
-        showQuizResults();
+        result.innerHTML = `
+            <div class="result-box">
+                <h3>Not enough information</h3>
+                <p>
+                    Add more detailed notes and try again.
+                </p>
+            </div>
+        `;
 
         return;
-    }
-
-
-    const quiz =
-        currentQuiz[
-            currentQuestion
-        ];
-
-
-    const questionNumber =
-        currentQuestion + 1;
-
-
-    const total =
-        currentQuiz.length;
-
-
-    /* ---------------------------------------------
-       Create different answer choices
-    --------------------------------------------- */
-
-    const wrongAnswers =
-        currentQuiz
-        .filter(
-            (_, index) =>
-                index !== currentQuestion
-        )
-        .map(
-            item =>
-                item.answer
-        );
-
-
-    let choices =
-        [quiz.answer];
-
-
-    wrongAnswers.forEach(
-        wrong => {
-
-            if (
-                wrong &&
-                wrong !== quiz.answer &&
-                choices.length < 4
-            ) {
-
-                choices.push(wrong);
-
-            }
-
-        }
-    );
-
-
-    while (
-        choices.length < 4
-    ) {
-
-        choices.push(
-            "None of these"
-        );
 
     }
-
-
-    choices =
-        shuffleArray(
-            choices
-        );
 
 
     result.innerHTML = `
 
-        <div class="quiz-progress">
+        <div class="result-box">
 
-            Question
-            ${questionNumber}
-            of
-            ${total}
+            <h3>🎯 Your Quiz</h3>
 
-        </div>
+            <p>
+                Choose one answer for each question.
+            </p>
+
+            ${currentQuiz.map((quiz, index) => `
+
+                <div class="quiz-question">
+
+                    <h4>
+                        ${index + 1}.
+                        ${escapeHTML(quiz.question)}
+                    </h4>
+
+                    ${quiz.options.map(option => `
+
+                        <label class="quiz-option">
+
+                            <input
+                                type="radio"
+                                name="question${index}"
+                                value="${escapeHTML(option)}"
+                            >
+
+                            ${escapeHTML(option)}
+
+                        </label>
+
+                    `).join("")}
+
+                </div>
+
+            `).join("")}
 
 
-        <div class="quiz-question">
+            <button
+                class="action-button"
+                onclick="checkQuiz()"
+            >
+                ✅ Check Answers
+            </button>
 
-            <h4>
-                ${quiz.question}
-            </h4>
-
-
-            <div class="quiz-choices">
-
-                ${choices.map(
-                    (choice, index) => `
-
-                    <button
-                        class="quiz-choice"
-                        onclick="selectAnswer(
-                            ${JSON.stringify(choice)}
-                        )"
-                    >
-
-                        <span>
-                            ${String.fromCharCode(
-                                65 + index
-                            )}
-                        </span>
-
-                        ${choice}
-
-                    </button>
-
-                `).join("")}
-
-            </div>
+            <div id="quizScore"></div>
 
         </div>
 
     `;
+
 }
 
 
-/* =====================================================
-   SELECT ANSWER
-===================================================== */
+function checkQuiz() {
 
-function selectAnswer(choice) {
-
-    const quiz =
-        currentQuiz[
-            currentQuestion
-        ];
+    let score = 0;
 
 
-    const result =
-        document
-        .getElementById("quizResult");
+    currentQuiz.forEach((quiz, index) => {
+
+        const selected =
+            document.querySelector(
+                `input[name="question${index}"]:checked`
+            );
 
 
-    const buttons =
-        document.querySelectorAll(
-            ".quiz-choice"
-        );
+        if (
+            selected &&
+            selected.value === quiz.answer
+        ) {
 
-
-    buttons.forEach(
-        button => {
-
-            button.disabled = true;
-
-
-            const text =
-                button.textContent
-                .trim()
-                .substring(1)
-                .trim();
-
-
-            if (
-                text === quiz.answer
-            ) {
-
-                button.classList.add(
-                    "correct"
-                );
-
-            }
-
-
-            if (
-                text === choice &&
-                choice !== quiz.answer
-            ) {
-
-                button.classList.add(
-                    "wrong"
-                );
-
-            }
+            score++;
 
         }
-    );
 
-
-    if (
-        choice === quiz.answer
-    ) {
-
-        quizScore++;
-
-        result.innerHTML += `
-
-            <div class="answer-feedback">
-
-                ✅ Correct!
-
-            </div>
-
-        `;
-
-    }
-
-    else {
-
-        result.innerHTML += `
-
-            <div class="answer-feedback">
-
-                ❌ Not quite.
-                <br>
-                Correct answer:
-                <strong>
-                    ${quiz.answer}
-                </strong>
-
-            </div>
-
-        `;
-
-    }
-
-
-    userAnswers.push({
-        question:
-            quiz.question,
-
-        selected:
-            choice,
-
-        correct:
-            quiz.answer
     });
 
 
-    result.innerHTML += `
-
-        <button
-            class="summarize-button next-question"
-            onclick="nextQuestion()"
-        >
-
-            ${
-                currentQuestion <
-                currentQuiz.length - 1
-                ? "Next Question →"
-                : "See My Results 🎉"
-            }
-
-        </button>
-
-    `;
-
-}
-
-
-/* =====================================================
-   NEXT QUESTION
-===================================================== */
-
-function nextQuestion() {
-
-    currentQuestion++;
-
-    showQuizQuestion();
-
-}
-
-
-/* =====================================================
-   QUIZ RESULTS
-===================================================== */
-
-function showQuizResults() {
-
-    const result =
-        document
-        .getElementById("quizResult");
-
-
-    const total =
-        currentQuiz.length;
+    const scoreBox =
+        document.getElementById("quizScore");
 
 
     const percentage =
         Math.round(
-            (quizScore / total) *
-            100
+            (score / currentQuiz.length) * 100
         );
 
 
-    let message;
+    let message = "";
 
-
-    if (percentage >= 90) {
-
-        message =
-            "🔥 Amazing! You really know this topic!";
-
+    if (percentage === 100) {
+        message = "🔥 PERFECT SCORE!";
     }
-
-    else if (percentage >= 70) {
-
-        message =
-            "🌟 Great job! Keep practicing!";
-
+    else if (percentage >= 80) {
+        message = "🌟 Amazing work!";
     }
-
-    else if (percentage >= 50) {
-
-        message =
-            "💪 Good start! A little more revision will help.";
-
+    else if (percentage >= 60) {
+        message = "👍 Good job!";
     }
-
     else {
-
-        message =
-            "📚 Keep studying! You can improve this score.";
-
+        message = "📚 Keep practicing!";
     }
 
 
-    result.innerHTML = `
+    scoreBox.innerHTML = `
 
-        <div class="quiz-final-result">
+        <div class="quiz-score">
 
-            <div class="result-icon">
-                🏆
-            </div>
-
-            <h3>
-                Quiz Complete!
-            </h3>
-
-
-            <div class="score">
-
-                ${quizScore}
-                /
-                ${total}
-
-            </div>
-
-
-            <p>
-                ${percentage}%
-            </p>
-
-
-            <strong>
-                ${message}
-            </strong>
-
+            ${message}
 
             <br><br>
 
+            You scored
+            ${score}/${currentQuiz.length}
+
+            <br>
+
+            ${percentage}%
 
             <button
-                class="summarize-button"
-                onclick="restartQuiz()"
+                class="action-button"
+                onclick="generateQuiz()"
             >
-
-                🔄 Retake Quiz
-
+                🔄 Generate New Quiz
             </button>
 
         </div>
 
     `;
 
-}
-
-
-/* =====================================================
-   RESTART QUIZ
-===================================================== */
-
-function restartQuiz() {
-
-    currentQuiz = [];
-
-    currentQuestion = 0;
-
-    userAnswers = [];
-
-    quizScore = 0;
-
-
-    generateQuiz();
+    addProgress();
 
 }
 
 
-/* =====================================================
-   SHUFFLE
-===================================================== */
+/* =========================================
+   FLASHCARDS
+========================================= */
 
-function shuffleArray(array) {
+let flashcards = [];
+let flashcardIndex = 0;
 
-    const copy =
-        [...array];
-
-
-    for (
-        let i =
-            copy.length - 1;
-
-        i > 0;
-
-        i--
-    ) {
-
-        const j =
-            Math.floor(
-                Math.random() *
-                (i + 1)
-            );
-
-
-        [
-            copy[i],
-            copy[j]
-        ] = [
-            copy[j],
-            copy[i]
-        ];
-
-    }
-
-
-    return copy;
-}
-/* =====================================================
-   STUDYSPARK AI - EXTRA STUDY TOOLS
-===================================================== */
-
-
-/* =====================================================
-   OPEN EXTRA TOOLS
-===================================================== */
-
-function openTool(tool) {
-
-    const sections = {
-        summarizer: "summarizer",
-        quiz: "quiz",
-        flashcards: "flashcards",
-        assistant: "assistant",
-        planner: "planner",
-        timer: "timer",
-        progress: "progress",
-        teacher: "teacher"
-    };
-
-    const sectionId = sections[tool];
-
-    if (sectionId) {
-
-        const section =
-            document.getElementById(sectionId);
-
-        if (section) {
-
-            section.scrollIntoView({
-                behavior: "smooth"
-            });
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   SMART FLASHCARDS
-===================================================== */
 
 function createFlashcards() {
 
-    const notes =
-        document.getElementById("flashcardNotes").value.trim();
+    const textarea =
+        document.getElementById("flashcardNotes");
+
+    const result =
+        document.getElementById("flashcardResult");
+
+    const text =
+        textarea.value.trim();
+
+
+    if (!text) {
+
+        result.innerHTML = `
+
+            <div class="result-box">
+
+                <h3>📚 Add Your Notes First</h3>
+
+                <p>
+                    Upload a file or paste your notes.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const sentenceList =
+        getSentences(text);
+
+
+    flashcards = [];
+
+
+    sentenceList
+        .slice(0, 15)
+        .forEach((sentence, index) => {
+
+            const words =
+                sentence.split(" ");
+
+
+            const importantWord =
+                words.find(
+                    word =>
+                    word.replace(/[,.!?]/g, "").length > 6
+                );
+
+
+            flashcards.push({
+
+                question:
+                    "What is the key idea in this statement?",
+
+                answer:
+                    sentence +
+                    (
+                        importantWord
+                        ? `\n\nKey term: ${importantWord}`
+                        : ""
+                    )
+
+            });
+
+        });
+
+
+    if (flashcards.length === 0) {
+
+        flashcards.push({
+
+            question:
+                "What is the main idea of your notes?",
+
+            answer:
+                text
+
+        });
+
+    }
+
+
+    flashcardIndex = 0;
+
+    renderFlashcard();
+
+    addProgress();
+
+}
+
+
+function renderFlashcard() {
 
     const result =
         document.getElementById("flashcardResult");
 
 
+    const card =
+        flashcards[flashcardIndex];
+
+
+    result.innerHTML = `
+
+        <div class="result-box">
+
+            <p style="text-align:center;">
+                Card ${flashcardIndex + 1}
+                of ${flashcards.length}
+            </p>
+
+
+            <div
+                class="flashcard"
+                onclick="
+                    this.classList.toggle('flipped')
+                "
+            >
+
+                <div class="flashcard-inner">
+
+                    <div class="flash-front">
+
+                        ${escapeHTML(card.question)}
+
+                    </div>
+
+
+                    <div class="flash-back">
+
+                        ${escapeHTML(card.answer)}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <p style="text-align:center;">
+                👆 Click the card to flip it
+            </p>
+
+
+            <div class="flash-controls">
+
+                <button onclick="previousCard()">
+                    ← Previous
+                </button>
+
+                <button onclick="nextCard()">
+                    Next →
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+function nextCard() {
+
+    if (flashcards.length === 0) {
+        return;
+    }
+
+
+    flashcardIndex =
+        (flashcardIndex + 1)
+        % flashcards.length;
+
+
+    renderFlashcard();
+
+}
+
+
+function previousCard() {
+
+    if (flashcards.length === 0) {
+        return;
+    }
+
+
+    flashcardIndex =
+        (flashcardIndex - 1 + flashcards.length)
+        % flashcards.length;
+
+
+    renderFlashcard();
+
+}
+
+
+/* =========================================
+   AI TEACHER
+========================================= */
+
+function teachTopic() {
+
+    const notes =
+        document.getElementById("teacherNotes")
+            .value.trim();
+
+
+    const question =
+        document.getElementById("teacherQuestion")
+            .value.trim();
+
+
+    const result =
+        document.getElementById("teacherResult");
+
+
     if (!notes) {
 
         result.innerHTML = `
-            <div class="tool-result">
-                <h3>⚠️ Add your notes first</h3>
-                <p>
-                    Paste your study material above.
-                </p>
+
+            <div class="chat-message ai-message">
+
+                📚 Please upload or paste your study
+                material first.
+
             </div>
+
         `;
 
         return;
+
     }
 
 
     const sentences =
-        notes
-        .split(/[.!?]+/)
-        .map(s => s.trim())
-        .filter(s => s.length > 20);
+        getSentences(notes)
+            .slice(0, 5);
 
 
-    if (sentences.length < 2) {
-
-        result.innerHTML = `
-            <div class="tool-result">
-                <h3>⚠️ Add more information</h3>
-                <p>
-                    Add a few sentences so StudySpark
-                    can create useful flashcards.
-                </p>
-            </div>
-        `;
-
-        return;
-    }
-
-
-    const cards =
-        sentences.slice(0, 12);
+    const topic =
+        question ||
+        "this topic";
 
 
     result.innerHTML = `
 
-        <h3>🃏 Your Flashcards</h3>
+        <div class="chat-message user-message">
 
-        <p>
-            Click a card to reveal the answer.
-        </p>
+            You asked:
 
-        <div class="flashcard-grid">
-
-            ${cards.map((sentence, index) => `
-
-                <div
-                    class="flashcard"
-                    onclick="flipFlashcard(this)"
-                >
-
-                    <div class="flashcard-front">
-
-                        <strong>
-                            Card ${index + 1}
-                        </strong>
-
-                        <p>
-                            What is the key idea?
-                        </p>
-
-                    </div>
-
-
-                    <div class="flashcard-back">
-
-                        <p>
-                            ${sentence}
-                        </p>
-
-                    </div>
-
-                </div>
-
-            `).join("")}
+            <strong>
+                ${escapeHTML(topic)}
+            </strong>
 
         </div>
+
+
+        <div class="chat-message ai-message">
+
+            <strong>
+                👩‍🏫 StudySpark Teacher
+            </strong>
+
+            <p style="margin-top:12px;">
+
+                Let's make this easy.
+
+                Here are the important ideas
+                from your material:
+
+            </p>
+
+
+            <ul style="
+                margin-top:12px;
+                padding-left:20px;
+                line-height:1.8;
+            ">
+
+                ${sentences.map(sentence => `
+
+                    <li>
+                        ${escapeHTML(sentence)}
+                    </li>
+
+                `).join("")}
+
+            </ul>
+
+
+            <p style="margin-top:15px;">
+
+                💡 <strong>Study tip:</strong>
+
+                Read these points, close your notes,
+                and explain the topic in your own words.
+
+            </p>
+
+        </div>
+
     `;
-}
 
-
-function flipFlashcard(card) {
-
-    card.classList.toggle("flipped");
+    addProgress();
 
 }
 
 
-/* =====================================================
-   STUDY PLANNER
-===================================================== */
+/* =========================================
+   STUDY ASSISTANT
+========================================= */
 
-function createStudyPlan() {
+function askAssistant() {
 
-    const subject =
-        document.getElementById("plannerSubject")
-        .value
-        .trim();
+    const notes =
+        document.getElementById("assistantNotes")
+            .value.trim();
 
 
-    const hours =
-        parseInt(
-            document.getElementById("plannerHours").value
-        );
+    const question =
+        document.getElementById("assistantQuestion")
+            .value.trim();
 
 
     const result =
-        document.getElementById("plannerResult");
+        document.getElementById("assistantResult");
 
 
-    if (!subject || !hours) {
+    if (!notes) {
 
         result.innerHTML = `
-            <div class="tool-result">
-                <h3>⚠️ Enter your subject and time</h3>
+
+            <div class="chat-message ai-message">
+
+                📚 Please add your study material first.
+
             </div>
+
         `;
 
         return;
+
     }
 
 
-    const tasks = [
-        "Learn the main concepts",
-        "Review important definitions",
-        "Practice questions",
-        "Review mistakes",
-        "Quick final revision"
-    ];
+    if (!question) {
+
+        result.innerHTML = `
+
+            <div class="chat-message ai-message">
+
+                💬 Type a question about your notes.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
 
 
-    let plan = "";
-
-    const minutes =
-        Math.max(
-            15,
-            Math.floor(
-                (hours * 60) / tasks.length
-            )
-        );
+    const questionWords =
+        question
+            .toLowerCase()
+            .split(/\s+/)
+            .filter(word => word.length > 4);
 
 
-    tasks.forEach(
-        (task, index) => {
+    const relevant =
+        getSentences(notes)
+            .filter(sentence => {
 
-            plan += `
+                const lower =
+                    sentence.toLowerCase();
 
-                <div class="plan-item">
+                return questionWords.some(
+                    word =>
+                    lower.includes(word)
+                );
 
-                    <strong>
-                        Session ${index + 1}
-                    </strong>
+            })
+            .slice(0, 3);
 
-                    <span>
-                        ${task}
-                    </span>
 
-                    <small>
-                        ${minutes} minutes
-                    </small>
+    let answer;
 
-                </div>
 
-            `;
+    if (relevant.length > 0) {
 
-        }
-    );
+        answer =
+            relevant.join(". ") + ".";
+
+    }
+    else {
+
+        answer =
+            "I couldn't find an exact answer in the material you provided. Try asking about a specific word, concept, or sentence from your notes.";
+
+    }
 
 
     result.innerHTML = `
 
-        <div class="tool-result">
+        <div class="chat-message user-message">
 
-            <h3>
-                📅 Your ${subject} Study Plan
-            </h3>
+            ${escapeHTML(question)}
 
-            ${plan}
+        </div>
+
+
+        <div class="chat-message ai-message">
+
+            <strong>
+                🤖 StudySpark
+            </strong>
+
+            <p style="margin-top:10px;">
+
+                ${escapeHTML(answer)}
+
+            </p>
 
         </div>
 
     `;
 
+    addProgress();
+
 }
 
 
-/* =====================================================
+/* =========================================
+   STUDY PLANNER
+========================================= */
+
+let tasks =
+    JSON.parse(
+        localStorage.getItem(
+            "studySparkTasks"
+        ) || "[]"
+    );
+
+
+function addTask() {
+
+    const input =
+        document.getElementById("taskInput");
+
+
+    const text =
+        input.value.trim();
+
+
+    if (!text) {
+        return;
+    }
+
+
+    tasks.push({
+
+        text: text,
+
+        done: false
+
+    });
+
+
+    input.value = "";
+
+
+    saveTasks();
+
+    renderTasks();
+
+}
+
+
+function saveTasks() {
+
+    localStorage.setItem(
+        "studySparkTasks",
+        JSON.stringify(tasks)
+    );
+
+}
+
+
+function renderTasks() {
+
+    const list =
+        document.getElementById("taskList");
+
+
+    if (!list) {
+        return;
+    }
+
+
+    if (tasks.length === 0) {
+
+        list.innerHTML = `
+
+            <p>
+                📚 No study tasks yet.
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        tasks.map((task, index) => `
+
+            <div style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+                margin:12px 0;
+            ">
+
+                <input
+                    type="checkbox"
+                    ${task.done ? "checked" : ""}
+                    onchange="toggleTask(${index})"
+                >
+
+
+                <span style="
+                    flex:1;
+                    text-decoration:
+                    ${task.done
+                        ? "line-through"
+                        : "none"};
+                ">
+
+                    ${escapeHTML(task.text)}
+
+                </span>
+
+
+                <button
+                    onclick="deleteTask(${index})"
+                    style="
+                        border:none;
+                        background:#ff6b81;
+                        color:white;
+                        padding:8px 10px;
+                        border-radius:8px;
+                    "
+                >
+
+                    🗑
+
+                </button>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+function toggleTask(index) {
+
+    tasks[index].done =
+        !tasks[index].done;
+
+
+    saveTasks();
+
+    renderTasks();
+
+    addProgress();
+
+}
+
+
+function deleteTask(index) {
+
+    tasks.splice(index, 1);
+
+    saveTasks();
+
+    renderTasks();
+
+}
+
+
+/* =========================================
    FOCUS TIMER
-===================================================== */
+========================================= */
 
 let timerSeconds = 25 * 60;
+
 let timerInterval = null;
 
 
-function updateTimerDisplay() {
+function updateTimer() {
 
     const display =
         document.getElementById("timerDisplay");
 
 
-    if (!display) return;
+    if (!display) {
+        return;
+    }
 
 
     const minutes =
-        Math.floor(timerSeconds / 60);
+        Math.floor(
+            timerSeconds / 60
+        );
 
 
     const seconds =
@@ -1182,40 +1226,48 @@ function updateTimerDisplay() {
 
 
     display.textContent =
+
         String(minutes).padStart(2, "0")
-        + ":"
-        + String(seconds).padStart(2, "0");
+        +
+        ":"
+        +
+        String(seconds).padStart(2, "0");
 
 }
 
 
 function startTimer() {
 
-    if (timerInterval) return;
+    if (timerInterval) {
+        return;
+    }
 
 
     timerInterval =
-        setInterval(() => {
+        setInterval(function () {
 
             if (timerSeconds > 0) {
 
                 timerSeconds--;
 
-                updateTimerDisplay();
+                updateTimer();
 
             }
-
             else {
 
-                clearInterval(timerInterval);
+                clearInterval(
+                    timerInterval
+                );
 
                 timerInterval = null;
 
+
                 alert(
-                    "🎉 Focus session complete! Great work!"
+                    "🎉 Focus session complete!"
                 );
 
-                addStudySession();
+
+                addProgress();
 
             }
 
@@ -1226,7 +1278,9 @@ function startTimer() {
 
 function pauseTimer() {
 
-    clearInterval(timerInterval);
+    clearInterval(
+        timerInterval
+    );
 
     timerInterval = null;
 
@@ -1235,881 +1289,121 @@ function pauseTimer() {
 
 function resetTimer() {
 
-    clearInterval(timerInterval);
+    pauseTimer();
 
-    timerInterval = null;
+    timerSeconds =
+        25 * 60;
 
-    timerSeconds = 25 * 60;
-
-    updateTimerDisplay();
+    updateTimer();
 
 }
 
 
-document.addEventListener(
-    "DOMContentLoaded",
-    updateTimerDisplay
-);
+/* =========================================
+   PROGRESS
+========================================= */
 
-
-/* =====================================================
-   PROGRESS TRACKER
-===================================================== */
-
-function getStudySessions() {
-
-    return parseInt(
+let progress =
+    Number(
         localStorage.getItem(
-            "studySparkSessions"
-        ) || "0"
+            "studySparkProgress"
+        ) || 0
     );
 
-}
 
+function addProgress() {
 
-function updateProgressDisplay() {
-
-    const display =
-        document.getElementById("sessionCount");
-
-
-    if (display) {
-
-        display.textContent =
-            getStudySessions();
-
-    }
-
-}
-
-
-function addStudySession() {
-
-    const sessions =
-        getStudySessions() + 1;
+    progress++;
 
 
     localStorage.setItem(
-        "studySparkSessions",
-        sessions
+        "studySparkProgress",
+        progress
     );
 
 
-    updateProgressDisplay();
+    renderProgress();
 
 }
 
 
-function resetProgress() {
-
-    localStorage.setItem(
-        "studySparkSessions",
-        "0"
-    );
-
-
-    updateProgressDisplay();
-
-}
-
-
-document.addEventListener(
-    "DOMContentLoaded",
-    updateProgressDisplay
-);
-
-
-/* =====================================================
-   AI TEACHER - STUDY EXPLANATION
-===================================================== */
-
-function explainTopic() {
-
-    const input =
-        document
-        .getElementById("teacherTopic2");
-
+function renderProgress() {
 
     const result =
-        document
-        .getElementById("teacherExplanation");
+        document.getElementById(
+            "progressResult"
+        );
 
 
-    const topic =
-        input.value.trim();
-
-
-    if (!topic) {
-
-        result.innerHTML = `
-            <div class="tool-result">
-
-                <h3>⚠️ Enter a topic</h3>
-
-                <p>
-                    Type the topic you want to learn.
-                </p>
-
-            </div>
-        `;
-
+    if (!result) {
         return;
     }
 
 
     result.innerHTML = `
 
-        <div class="tool-result">
+        <h3>
+            🌟 Your Study Progress
+        </h3>
 
-            <h3>
-                👩‍🏫 Learning: ${topic}
-            </h3>
 
-            <p>
-                StudySpark is preparing a simple
-                explanation for this topic.
-            </p>
+        <p style="
+            font-size:42px;
+            font-weight:900;
+            color:#7567ff;
+            margin:20px 0;
+        ">
 
-            <div class="teacher-steps">
+            ${progress}
 
-                <div>
-                    <strong>1. Understand</strong>
-                    <p>
-                        Start with the basic meaning
-                        of ${topic}.
-                    </p>
-                </div>
+        </p>
 
-                <div>
-                    <strong>2. Break it down</strong>
-                    <p>
-                        Divide the topic into smaller
-                        concepts.
-                    </p>
-                </div>
 
-                <div>
-                    <strong>3. Practice</strong>
-                    <p>
-                        Test yourself with questions
-                        and examples.
-                    </p>
-                </div>
+        <p>
+            study activities completed.
+        </p>
 
-            </div>
 
-        </div>
+        <p style="margin-top:15px;">
+
+            Keep going! 🚀
+            Every study session counts.
+
+        </p>
 
     `;
 
 }
 
 
-/* =====================================================
-   SIMPLE TEACHER CHAT
-===================================================== */
+/* =========================================
+   STARTUP
+========================================= */
 
-function askTeacher() {
+renderTasks();
 
-    const topic =
-        document
-        .getElementById("teacherTopic")
-        .value
-        .trim();
+renderProgress();
 
+updateTimer();
 
-    const question =
-        document
-        .getElementById("teacherQuestion")
-        .value
-        .trim();
 
+/*
+   The intro animation finishes automatically.
+*/
 
-    const result =
-        document
-        .getElementById("teacherResult");
+setTimeout(function () {
 
+    const intro =
+        document.getElementById("intro");
 
-    if (!question) {
 
-        result.innerHTML = `
-            <div class="tool-result">
+    if (intro) {
 
-                <h3>⚠️ Ask a question first</h3>
-
-            </div>
-        `;
-
-        return;
-    }
-
-
-    result.innerHTML = `
-
-        <div class="tool-result">
-
-            <h3>
-                🤖 StudySpark Teacher
-            </h3>
-
-            <p>
-
-                Your question about
-                <strong>
-                    ${topic || "your topic"}
-                </strong>
-                is:
-
-            </p>
-
-            <p>
-                <strong>
-                    ${question}
-                </strong>
-            </p>
-
-            <hr>
-
-            <p>
-                💡 To answer this properly with
-                real AI, we'll connect StudySpark
-                to the AI backend in the next stage.
-            </p>
-
-        </div>
-
-    `;
-
-}
-/* =====================================================
-   S14 - UNIVERSAL STUDY MATERIAL
-   One upload for all StudySpark tools
-===================================================== */
-
-let studyMaterialFile = null;
-let studyMaterialName = "";
-let studyMaterialType = "";
-let studyMaterialSize = 0;
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const fileInput = document.getElementById("studyFile");
-    const fileName = document.getElementById("fileName");
-    const fileInfo = document.getElementById("fileInfo");
-    const materialStatus = document.getElementById("materialStatus");
-
-    if (!fileInput) return;
-
-    fileInput.addEventListener("change", function () {
-
-        const file = fileInput.files[0];
-
-        if (!file) {
-            studyMaterialFile = null;
-            studyMaterialName = "";
-            studyMaterialType = "";
-            studyMaterialSize = 0;
-
-            if (fileName) {
-                fileName.textContent = "No file selected";
-            }
-
-            if (fileInfo) {
-                fileInfo.textContent =
-                    "Upload something to start studying";
-            }
-
-            if (materialStatus) {
-                materialStatus.innerHTML =
-                    "<span>●</span> No study material uploaded yet.";
-            }
-
-            return;
-        }
-
-        /* Save the uploaded material globally */
-
-        studyMaterialFile = file;
-        studyMaterialName = file.name;
-        studyMaterialType = file.type;
-        studyMaterialSize = file.size;
-
-
-        /* Show file name */
-
-        if (fileName) {
-            fileName.textContent = file.name;
-        }
-
-
-        /* Show file information */
-
-        if (fileInfo) {
-
-            const sizeMB =
-                (file.size / (1024 * 1024)).toFixed(2);
-
-            fileInfo.textContent =
-                `${file.type || "Study material"} • ${sizeMB} MB`;
-
-        }
-
-
-        /* Show connected status */
-
-        if (materialStatus) {
-
-            materialStatus.innerHTML =
-                "<span>●</span> Study material ready for Summarizer, Quiz AI, Flashcards and AI Teacher.";
-
-        }
-
-        console.log(
-            "StudySpark material loaded:",
-            file.name
-        );
-
-    });
-
-});
-
-
-/* =====================================================
-   GET CURRENT STUDY MATERIAL
-===================================================== */
-
-function getStudyMaterial() {
-
-    return studyMaterialFile;
-
-}
-
-
-/* =====================================================
-   CHECK WHETHER MATERIAL EXISTS
-===================================================== */
-
-function hasStudyMaterial() {
-
-    return studyMaterialFile !== null;
-
-}
-
-
-/* =====================================================
-   GET MATERIAL NAME
-===================================================== */
-
-function getStudyMaterialName() {
-
-    return studyMaterialName;
-
-}
-/* =====================================================
-   STUDYSPARK AI - UNIVERSAL STUDY MATERIAL UPLOADER
-   Adds Upload + Paste options to Quiz, Flashcards,
-   Study Assistant and AI Teacher
-===================================================== */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    /* -------------------------------------------------
-       CREATE A REUSABLE UPLOAD BOX
-    ------------------------------------------------- */
-
-    function createStudyUploader(textareaId, title) {
-
-        const textarea = document.getElementById(textareaId);
-
-        if (!textarea) return;
-
-        /* Don't create it twice */
-        if (document.getElementById(textareaId + "-upload")) return;
-
-        const wrapper = document.createElement("div");
-
-        wrapper.id = textareaId + "-upload";
-
-        wrapper.className = "study-upload-box";
-
-        wrapper.innerHTML = `
-            
-            <div class="study-upload-title">
-                📚 ${title}
-            </div>
-
-            <div class="study-upload-subtitle">
-                Upload your study material OR paste your notes below.
-            </div>
-
-            <label class="study-upload-button">
-
-                📁 Upload File
-
-                <input
-                    type="file"
-                    class="study-material-file"
-                    accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.mp3,.wav,.mp4,.mov"
-                    hidden
-                >
-
-            </label>
-
-            <div class="study-file-name">
-                No file selected
-            </div>
-
-            <div class="study-or">
-                OR
-            </div>
-
-        `;
-
-        /* Put uploader directly BEFORE textarea */
-        textarea.parentNode.insertBefore(
-            wrapper,
-            textarea
-        );
-
-        const fileInput =
-            wrapper.querySelector(".study-material-file");
-
-        const fileName =
-            wrapper.querySelector(".study-file-name");
-
-        fileInput.addEventListener("change", function () {
-
-            if (!fileInput.files.length) return;
-
-            const file = fileInput.files[0];
-
-            fileName.textContent =
-                "📎 " + file.name;
-
-            /* Read text files automatically */
-            if (
-                file.type === "text/plain" ||
-                file.name.toLowerCase().endsWith(".txt")
-            ) {
-
-                const reader = new FileReader();
-
-                reader.onload = function (event) {
-
-                    textarea.value =
-                        event.target.result;
-
-                    textarea.dispatchEvent(
-                        new Event("input")
-                    );
-
-                };
-
-                reader.readAsText(file);
-
-            }
-
-            else {
-
-                fileName.textContent =
-                    "📎 " +
-                    file.name +
-                    " selected";
-
-            }
-
-        });
+        intro.style.pointerEvents =
+            "none";
 
     }
 
+}, 4500);
 
-    /* -------------------------------------------------
-       QUIZ
-    ------------------------------------------------- */
 
-    createStudyUploader(
-        "quizNotes",
-        "Add Material for Your Quiz"
-    );
-
-
-    /* -------------------------------------------------
-       FLASHCARDS
-    ------------------------------------------------- */
-
-    createStudyUploader(
-        "flashcardNotes",
-        "Add Material for Your Flashcards"
-    );
-
-
-    /* -------------------------------------------------
-       STUDY ASSISTANT
-    ------------------------------------------------- */
-
-    createStudyUploader(
-        "teacherQuestion",
-        "Add Material for Your Study Assistant"
-    );
-
-
-    /* -------------------------------------------------
-       AI TEACHER
-    ------------------------------------------------- */
-
-    createStudyUploader(
-        "teacherTopic2",
-        "Add Material for Your AI Teacher"
-    );
-
-});
-
-
-/* =====================================================
-   FILE READER FOR PDF / WORD / IMAGE / AUDIO / VIDEO
-===================================================== */
-
-function handleStudyFile(file, textarea) {
-
-    if (!file || !textarea) return;
-
-
-    /* TEXT FILE */
-
-    if (
-        file.type === "text/plain" ||
-        file.name.toLowerCase().endsWith(".txt")
-    ) {
-
-        const reader = new FileReader();
-
-        reader.onload = function (event) {
-
-            textarea.value =
-                event.target.result;
-
-        };
-
-        reader.readAsText(file);
-
-        return;
-    }
-
-
-    /* OTHER FILE TYPES */
-
-    textarea.value =
-        `[Uploaded study material: ${file.name}]
-
-The file has been selected successfully.
-
-StudySpark AI can use this material when connected to an AI/document-processing service.`;
-
-}
-
-
-/* =====================================================
-   EXTRA UPLOADER FOR SUMMARIZER
-   IMPROVES THE EXISTING UPLOAD SYSTEM
-===================================================== */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const studyFile =
-        document.getElementById("studyFile");
-
-    const studyNotes =
-        document.getElementById("studyNotes");
-
-    if (!studyFile || !studyNotes) return;
-
-
-    studyFile.addEventListener("change", function () {
-
-        if (!studyFile.files.length) return;
-
-        const file =
-            studyFile.files[0];
-
-
-        /* TEXT FILE */
-
-        if (
-            file.type === "text/plain" ||
-            file.name.toLowerCase().endsWith(".txt")
-        ) {
-
-            const reader =
-                new FileReader();
-
-            reader.onload =
-                function (event) {
-
-                    studyNotes.value =
-                        event.target.result;
-
-                };
-
-            reader.readAsText(file);
-
-        }
-
-    });
-
-});
-
-
-/* =====================================================
-   MAKE UPLOADED FILES WORK WITH BUTTONS
-===================================================== */
-
-function getStudyMaterial(textareaId) {
-
-    const textarea =
-        document.getElementById(textareaId);
-
-    if (!textarea) return "";
-
-    return textarea.value.trim();
-
-}
-
-
-/* =====================================================
-   BETTER QUIZ MATERIAL CHECK
-===================================================== */
-
-const originalGenerateQuiz =
-    window.generateQuiz;
-
-window.generateQuiz = function () {
-
-    const notes =
-        getStudyMaterial("quizNotes");
-
-    const result =
-        document.getElementById("quizResult");
-
-    if (!notes) {
-
-        if (result) {
-
-            result.innerHTML = `
-
-                <div class="tool-result">
-
-                    <h3>📚 Add Your Study Material</h3>
-
-                    <p>
-                        Upload a file or paste your notes
-                        before creating the quiz.
-                    </p>
-
-                </div>
-
-            `;
-
-        }
-
-        return;
-
-    }
-
-
-    if (typeof originalGenerateQuiz === "function") {
-
-        originalGenerateQuiz();
-
-    }
-
-};
-
-
-/* =====================================================
-   BETTER FLASHCARD MATERIAL CHECK
-===================================================== */
-
-const originalCreateFlashcards =
-    window.createFlashcards;
-
-window.createFlashcards = function () {
-
-    const notes =
-        getStudyMaterial("flashcardNotes");
-
-    const result =
-        document.getElementById("flashcardResult");
-
-
-    if (!notes) {
-
-        if (result) {
-
-            result.innerHTML = `
-
-                <div class="tool-result">
-
-                    <h3>📚 Add Your Study Material</h3>
-
-                    <p>
-                        Upload a file or paste your notes
-                        before creating flashcards.
-                    </p>
-
-                </div>
-
-            `;
-
-        }
-
-        return;
-
-    }
-
-
-    if (
-        typeof originalCreateFlashcards ===
-        "function"
-    ) {
-
-        originalCreateFlashcards();
-
-    }
-
-};
-
-
-/* =====================================================
-   STUDYSPARK UPLOADER STYLING
-===================================================== */
-
-const studyUploaderStyle =
-document.createElement("style");
-
-studyUploaderStyle.innerHTML = `
-
-.study-upload-box {
-
-    margin-bottom: 18px;
-
-    padding: 20px;
-
-    border-radius: 18px;
-
-    border: 2px dashed #7567ff;
-
-    background: rgba(117, 103, 255, 0.06);
-
-    text-align: center;
-
-}
-
-
-.study-upload-title {
-
-    font-size: 20px;
-
-    font-weight: 700;
-
-    margin-bottom: 6px;
-
-}
-
-
-.study-upload-subtitle {
-
-    font-size: 14px;
-
-    color: #777;
-
-    margin-bottom: 15px;
-
-}
-
-
-.study-upload-button {
-
-    display: inline-block;
-
-    padding: 12px 20px;
-
-    border-radius: 12px;
-
-    background: #7567ff;
-
-    color: white;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-
-}
-
-
-.study-upload-button:hover {
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 8px 20px
-        rgba(117,103,255,0.25);
-
-}
-
-
-.study-file-name {
-
-    margin-top: 12px;
-
-    font-size: 14px;
-
-    color: #666;
-
-    word-break: break-word;
-
-}
-
-
-.study-or {
-
-    margin-top: 15px;
-
-    font-size: 13px;
-
-    font-weight: 700;
-
-    color: #999;
-
-}
-
-
-body.dark .study-upload-box {
-
-    background: rgba(117,103,255,0.12);
-
-    border-color: #9b8cff;
-
-}
-
-
-body.dark .study-upload-subtitle,
-
-body.dark .study-file-name {
-
-    color: #c5c5d5;
-
-}
-
-`;
-
-
-document.head.appendChild(
-    studyUploaderStyle
-);
-
-
-/* =====================================================
-   END
-===================================================== */
