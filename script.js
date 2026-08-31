@@ -597,6 +597,8 @@ let flashcards = [];
 let flashcardIndex = 0;
 
 
+/* Create useful question + answer cards */
+
 function createFlashcards() {
 
     const textarea =
@@ -605,80 +607,125 @@ function createFlashcards() {
     const result =
         document.getElementById("flashcardResult");
 
-    const text =
-        textarea.value.trim();
-
+    const text = textarea.value.trim();
 
     if (!text) {
 
         result.innerHTML = `
-
             <div class="result-box">
-
                 <h3>📚 Add Your Notes First</h3>
-
-                <p>
-                    Upload a file or paste your notes.
-                </p>
-
+                <p>Upload a file or paste your notes.</p>
             </div>
-
         `;
 
         return;
-
     }
 
 
-    const sentenceList =
-        getSentences(text);
+    /*
+       Break the notes into individual statements.
+    */
+
+    const sentences = text
+        .split(/[.!?]+/)
+        .map(sentence => sentence.trim())
+        .filter(sentence => sentence.length > 20);
 
 
     flashcards = [];
 
 
-    sentenceList
-        .slice(0, 15)
-        .forEach((sentence, index) => {
+    /*
+       Create a question from each useful statement.
+    */
 
-            const words =
-                sentence.split(" ");
+    sentences.slice(0, 15).forEach(sentence => {
 
+        const words = sentence.split(/\s+/);
 
-            const importantWord =
-                words.find(
-                    word =>
-                    word.replace(/[,.!?]/g, "").length > 6
-                );
+        if (words.length < 5) return;
 
 
-            flashcards.push({
+        /*
+           Find an important-looking term.
+        */
 
-                question:
-                    "What is the key idea in this statement?",
+        let importantWord = words.find(word => {
 
-                answer:
-                    sentence +
-                    (
-                        importantWord
-                        ? `\n\nKey term: ${importantWord}`
-                        : ""
-                    )
+            const clean = word
+                .replace(/[^a-zA-Z0-9]/g, "");
 
-            });
+            return clean.length >= 6;
 
         });
 
+
+        if (!importantWord) {
+            importantWord = words[0];
+        }
+
+
+        importantWord =
+            importantWord.replace(/[.,!?;:]/g, "");
+
+
+        /*
+           QUESTION:
+           Turn the sentence into a
+           fill-in-the-blank question.
+        */
+
+        let question = sentence.replace(
+            new RegExp(
+                "\\b" +
+                importantWord.replace(
+                    /[.*+?^${}()|[\]\\]/g,
+                    "\\$&"
+                ) +
+                "\\b",
+                "i"
+            ),
+            "_____"
+        );
+
+
+        /*
+           If replacing the word didn't work,
+           make a normal question.
+        */
+
+        if (question === sentence) {
+
+            question =
+                "What does this statement explain?";
+
+        }
+
+
+        flashcards.push({
+
+            question: question + "?",
+
+            answer: sentence
+
+        });
+
+    });
+
+
+    /*
+       If the notes were too short,
+       create one general card.
+    */
 
     if (flashcards.length === 0) {
 
         flashcards.push({
 
             question:
-                "What is the main idea of your notes?",
+                "What is the main point of these notes?",
 
-            answer:
-                text
+            answer: text
 
         });
 
@@ -694,10 +741,19 @@ function createFlashcards() {
 }
 
 
+/* =========================================
+   SHOW CURRENT FLASHCARD
+========================================= */
+
 function renderFlashcard() {
 
     const result =
         document.getElementById("flashcardResult");
+
+
+    if (!result || flashcards.length === 0) {
+        return;
+    }
 
 
     const card =
@@ -708,52 +764,105 @@ function renderFlashcard() {
 
         <div class="result-box">
 
-            <p style="text-align:center;">
+            <p style="
+                text-align:center;
+                color:#777;
+                margin-bottom:15px;
+            ">
+
                 Card ${flashcardIndex + 1}
                 of ${flashcards.length}
+
             </p>
 
 
             <div
                 class="flashcard"
-                onclick="
-                    this.classList.toggle('flipped')
-                "
+                onclick="this.classList.toggle('flipped')"
             >
 
                 <div class="flashcard-inner">
 
+
+                    <!-- FRONT -->
+
                     <div class="flash-front">
 
-                        ${escapeHTML(card.question)}
+                        <div>
+
+                            <div style="
+                                font-size:14px;
+                                opacity:.8;
+                                margin-bottom:12px;
+                            ">
+
+                                QUESTION
+
+                            </div>
+
+                            ${escapeHTML(card.question)}
+
+                        </div>
 
                     </div>
 
+
+                    <!-- BACK -->
 
                     <div class="flash-back">
 
-                        ${escapeHTML(card.answer)}
+                        <div>
+
+                            <div style="
+                                font-size:14px;
+                                opacity:.8;
+                                margin-bottom:12px;
+                            ">
+
+                                ANSWER
+
+                            </div>
+
+                            ${escapeHTML(card.answer)}
+
+                        </div>
 
                     </div>
+
 
                 </div>
 
             </div>
 
 
-            <p style="text-align:center;">
-                👆 Click the card to flip it
+            <p style="
+                text-align:center;
+                margin-top:15px;
+                color:#777;
+            ">
+
+                👆 Click the card to see the answer
+
             </p>
 
 
             <div class="flash-controls">
 
-                <button onclick="previousCard()">
+                <button
+                    onclick="previousCard()"
+                >
+
                     ← Previous
+
                 </button>
 
-                <button onclick="nextCard()">
+
+                <button
+                    onclick="nextCard()"
+                >
+
                     Next →
+
                 </button>
 
             </div>
@@ -765,6 +874,10 @@ function renderFlashcard() {
 }
 
 
+/* =========================================
+   NEXT CARD
+========================================= */
+
 function nextCard() {
 
     if (flashcards.length === 0) {
@@ -773,14 +886,18 @@ function nextCard() {
 
 
     flashcardIndex =
-        (flashcardIndex + 1)
-        % flashcards.length;
+        (flashcardIndex + 1) %
+        flashcards.length;
 
 
     renderFlashcard();
 
 }
 
+
+/* =========================================
+   PREVIOUS CARD
+========================================= */
 
 function previousCard() {
 
@@ -790,14 +907,14 @@ function previousCard() {
 
 
     flashcardIndex =
-        (flashcardIndex - 1 + flashcards.length)
-        % flashcards.length;
+        (flashcardIndex - 1 +
+        flashcards.length) %
+        flashcards.length;
 
 
     renderFlashcard();
 
 }
-
 
 /* =========================================
    AI TEACHER
